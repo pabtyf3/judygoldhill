@@ -1,0 +1,10 @@
+INSERT INTO `applications` SET `file`='PCC Tender breakdown 2011.doc', `uniid`='1'POSTArray
+(
+    [Filename] => PCC Tender breakdown 2011.doc
+    [uniid] => 1
+    [Upload] => Submit Query
+)
+GETArray
+(
+)
+INSERT INTO `projectimage` SET `file`='1_Chrysanthemum.jpg',`projectid`='1'<br/>

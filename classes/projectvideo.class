@@ -1,0 +1,283 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+
+
+class projectvideo{
+    var $id="";
+    var $project="";
+    var $vidurl="";
+    var $thumbnail="";
+    var $order="";
+    var $title="";
+    var $is_thumbnail="";
+    
+    function __construct($id=""){
+        if($id!=""){
+            $this->id=$id;
+            $this->populate();
+        }
+    }
+    
+    function populate(){
+        $sql = "SELECT * FROM `projectvideo` WHERE `id`='".$this->id."' LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $row = mysql_fetch_assoc($res);
+            foreach($row as $k=>$v){
+                $this->$k=$v;
+            }
+            
+            $this->embed_code = $this->embed();
+        }
+    }
+    
+    
+    function embed(){
+        $ret='<iframe src="http://player.vimeo.com/video/'.$this->vimeoid.'" style="height:100%; width:100%;  max-width:1000x; max-height:697px;" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+        return($ret);
+    }
+    
+            function form($action="add"){
+        $ret.='<script type="text/javascript">
+        $(function(){
+        
+        $("#infofetch").click(function(){
+            $("#loader").append("<div id=\"loading_gif\"></div>");
+            $.get("/xml.php", { videourl: $("#videourl").val() })
+.done(function(data) {
+//alert("Data Loaded: " + data);
+//
+$("#loading_gif").remove();
+jasondata = $.parseJSON(data);
+$("#title").val(jasondata.title);
+$("#thumbnail").val(jasondata.mid_image);
+$("#thumbnailHolder").append("<img src=\""+jasondata.mid_image+"\" />");
+$("#vimeoid").val(jasondata.id);
+$("#width").val(jasondata.width);
+$("#height").val(jasondata.height);
+});
+            
+        })
+     ';
+    
+
+    
+    $ret.='   
+    
+    });
+    </script>
+    ';
+    
+    
+        
+        
+        $ret.="<form action = '/jg-admin/actions/formProcess.php' enctype='multipart/form-data' method='post' ><fieldset id='loader'>";
+        $ret.="<input type='hidden' name='class' value='projectvideo' />";
+        $ret.="<input type='hidden' name='project_id' value='";
+        $this->project_id = isset($_GET['project_id'])?$_GET['project_id']:$this->project_id;
+        $ret.=$this->project_id;
+        $ret.="'/>";
+        $ret.="<input type='hidden' name='id' value='".$this->id."'/>";
+        $ret.="<input type='hidden' name='action' value='".$action."' />";
+        $ret.="<input type='hidden' name='ret' value='/jg-admin/admin.php?class=projectvideo&project_id=".$this->project_id."' />";
+        $ret.="<input type='hidden' name='vimeoid' id='vimeoid' value='".$this->vimeoid."'/>";
+        $ret.="<input type='hidden' name='width' id='width' value='".$this->width."'/>";
+        $ret.="<input type='hidden' name='height' id='height' value='".$this->height."'/>";
+        $ret.="<table>";
+            $ret.="<tr><td>Video URL: </td><td><input type='text' class='the300' name='videourl' id='videourl' value='".$this->videourl."' /><input type='button' name='infofetch' id='infofetch' value='Get Details'</td></tr>";
+            $ret.="<tr><td>Title: </td><td><input type='text' class='the300' name='title' id='title' value='".$this->title."' /></td></tr>";
+           $ret.="<tr><td>Thumbnail: </td><td id='thumbnailHolder'><input type='hidden' name='thumbnail' id='thumbnail' class='datePick' value='".$this->thumbnail."' /></td></tr>";
+           // $ret.="<tr><td>End Date: </td><td><input type='text' name='enddate' id='enddate' class='datePick' value='".flipdate($this->enddate)."' /></td></tr>";
+           
+        //   $ret.="<tr><td>Embed Code: </td><td><textarea name='embedcode' id='embedcode' rows='6' cols='40' width='500px'></textarea></td></tr>";
+            
+          //  $ret.="<tr><td style='vertical-align:top;'>Details: </td><td><textarea name='content' id='content' rows='20' cols='40' width='500px'><div>".$this->content."</div></textarea></td></tr>";
+        
+            
+             $ret.="<tr><td colspan='2'><input type='submit' name='sC' value='Save' /></td></tr>";
+        $ret.="</table></fieldset></form>";
+        return($ret);
+    }
+    
+    
+    function processForm(){
+        if($_POST['action']=="add"){
+           // var_dump($_POST);
+            $sql = "INSERT INTO `projectvideo` SET 
+            `project_id`='".$_POST['project_id']."',
+            `title`='".$_POST['title']."',
+            `vimeoid`='".$_POST['vimeoid']."',
+            `thumbnail`='".$_POST['thumbnail']."',
+            `width`='".$_POST['width']."',
+            `height`='".$_POST['height']."'";
+            mysql_query($sql)or die($sql);
+        }else{
+           
+          
+            
+        }
+        
+       
+       //     return(mysql_insert_id());
+        //}
+        
+    }
+    
+    
+        function updateVideos(){
+        foreach($_POST as $k=>$v){
+            if(strpos($k,"rder")){
+                $id = str_replace("order","",$k);
+                $sql ="UPDATE `projectvideo` SET `order`='".$v."' WHERE `id`='".$id."'";
+                mysql_query($sql);
+            }
+        }
+        
+    }
+    
+    function admin(){
+        //$this->localize_thumbs();
+        $sql = "SELECT * FROM `projectvideo` WHERE `project_id`='".$_GET['project_id']."'";
+        $res = mysql_query($sql);
+        $ret="<a href='/jg-admin/actions/add.php?class=projectvideo&project_id=".$_GET['project_id']."' class='falsebutton'><img src='/css/icons/add.png' alt='Add a new Video item' />Add Video</a>";
+       
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $ret.="<script type='text/javascript'>
+            $(function(){
+                $('input:radio').change(function(){
+                    //alert($(this).val());
+                   window.location = '/jg-admin/actions/thumb_update.php?class=projectvideo&id='+$(this).val(); 
+                });
+                });
+            </script>";
+            $ret.="<form action='/jg-admin/actions/projectvideo_update.php' method='post'><fieldset>";
+                  $ret.="<table style='width:750px;'>
+                   <tr><td></td><td></td><td></td><td><input type='submit' name='sC' value='Save Changes' /></td></tr>
+            <tr><th>Title</th><th>Order</th><th>Thumbnail</th><th>Actions</th></tr>";
+            $x=0;  
+        while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tNews = new projectvideo($row['id']);
+            $ptitle = $tNews->name;
+            $ret.="<tr".$c."><td>".$tNews->title."</td><td><input type='text' name='order".$tNews->id."' style='width:3em;' value='".$tNews->order."' /></td>
+            <td style='text-align:center;'>
+            <input type='radio' name='thumbnail' value='".$tNews->id."'";
+            $ret .= $tNews->is_thumbnail==1?" checked='checked'":"";
+            $ret.=" />
+            </td><td style='text-align:center;'>
+            <a href='/jg-admin/actions/delete.php?class=projectvideo&id=".$tNews->id."'><img src='/css/icons/bin_closed.png' title='Delete Video' alt='Delete Video'/></a>
+            </td></tr>";
+            } 
+            $ret.="</table></fieldset></form>"; 
+        }
+        return($ret);
+    }
+        
+        
+        function fetchinfo($video_url){
+        #http://vimeo.com/2160340    
+      //  echo $video_url;
+        #http://vimeo.com/api/v2/video/2160340.xml    
+        $xml_url = str_replace(array("http://vimeo.com/","http://player.vimeo.com/video/","https://vimeo.com/","https://player.vimeo.com/video/"),"http://vimeo.com/api/v2/video/",$video_url).".xml";    
+        // echo $xml_url;   
+            //simple
+           // $xml = file_get_contents($xml_url);
+           #fucking hell now try curl:
+           $ch = curl_init($xml_url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$xml = curl_exec($ch);
+curl_close($ch);
+//$photos = simplexml_load_string($xml_raw)
+           
+           
+            
+$data = simplexml_load_string($xml);
+//var_dump($data);
+ foreach($data->video as $k=>$v){
+    //var_dump($v);
+  $ret['title']=(string)$v->title;
+  $ret['big_image']=(string)$v->thumbnail_large;
+  $ret['mid_image']=(string)$v->thumbnail_medium;
+  $ret['small_image']=(string)$v->thumbnail_small;
+  $ret['width'] = (string)$v->width;
+  $ret['height'] =(string)$v->height; 
+  $ret['id'] = (string)$v->id;
+ // $ret['embedcode'] = '<iframe src="http://player.vimeo.com/video/'.$ret['id'].'" width="'.$ret['width'].'" height="'.$ret['height'].'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+  
+   // $class = $k;
+    //echo $k[1]->title;
+    
+ }    
+ return($ret);
+
+        }
+        
+        function delete(){
+            if($this->id!=""){
+                $sql = "DELETE FROM `projectvideo` WHERE `id`='".$this->id."'";
+                mysql_query($sql);
+            }
+        }
+    
+    
+    function updateThumb(){
+        $sql = "UPDATE `projectvideo` SET `is_thumbnail`='0' WHERE `project_id`='".$this->project_id."'";
+        //echo $sql;
+        mysql_query($sql);
+        $sql2 = "UPDATE `projectvideo` SET `is_thumbnail`='1' WHERE `id`='".$this->id."' LIMIT 1";
+        mysql_query($sql2);
+    }
+    
+    
+  
+    
+        function getMyThumb($project_id=""){
+        if($project_id!=""){
+            $sql = "SELECT * FROM `projectvideo` WHERE `project_id`='".$project_id."' AND `is_thumbnail`='1'";
+            $res = mysql_query($sql);
+           // echo $sql;
+            if(mysql_num_rows($res)<1){
+                $sql = "SELECT * FROM `projectvideo` WHERE `project_id`='".$project_id."' ORDER BY `order` ASC LIMIT 1";
+                $res = mysql_query($sql);
+                if(mysql_num_rows($res)<1){
+                    return("");
+                }else{
+                    $row = mysql_fetch_assoc($res);
+                    return($row['thumbnail']);
+                }
+            }else{
+               
+                $row = mysql_fetch_assoc($res);
+                 //var_dump($row);
+                return($row['thumbnail']);
+            }
+        }
+    }
+    
+        function getByProject($id=""){
+        $sql ="SELECT * FROM `projectvideo` WHERE `project_id`='".$id."' ORDER BY `order`";
+        $res = mysql_query($sql);
+        $ims=array();
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $ims = array();
+            while($row = mysql_fetch_assoc($res)){
+                $ims[]=$row;
+            }
+        }
+        return($ims);
+    }
+    
+    
+}
+
+?>

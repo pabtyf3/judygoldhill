@@ -1,0 +1,464 @@
+<?php
+
+/**
+ * @author pabtyf
+ * @copyright 2012
+ */
+
+class news{
+    
+    var $id="";
+    var $title="";
+    var $shortdesc="";
+    var $date="";
+    var $page="";
+    var $offset="";
+    var $per_page="6";
+    //var $enddate="";
+    var $content="";
+    var $filter="";
+    var $archive="";
+    //var $image="";
+    
+    
+    function __construct($id="",$page="",$filter=""){
+        $this->page = $page;
+        $this->filter = $filter;
+        if($id!=""){
+            
+            $this->id=$id;
+            $this->populate();
+        }
+    }
+    
+    function populate(){
+        $sql ="SELECT * FROM `news` WHERE `id`='".$this->id."'";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $row = mysql_fetch_assoc($res);
+            foreach($row as $k=>$v){
+                $this->$k=$v;
+            }
+        }
+    }
+    
+    function frontEnd(){
+        $dat = date("j F Y",strtotime($this->flipdate($this->date)));
+       $ret="<div class='contentitem'>
+               ".$this->title."<a name='".$this->id."'>&nbsp;</a><br />
+                ".$this->type."<br />
+                ".$dat."<br/><br />
+
+               ".$this->content."";
+                  $urlForShare=rawurlencode("http://".$_SERVER['SERVER_NAME']."/exhibitions/#".$this->id);
+               
+               $ret.="<br /><a href='http://www.facebook.com/sharer.php?u=".$urlForShare."&t=".rawurlencode($this->title)."&src=sp'>Share on Facebook</a>";
+               
+               $ret.="<br /><br />";
+               if($this->image!=""){
+                $ret.=" <img src='/images/news/".$this->image."'  alt='".$this->title."'/>";
+               }
+
+               $ret.=" <div class='contentdivider'></div>
+        </div>";
+        return($ret);
+    }
+    
+    
+    
+    function getFrontend(){
+        $ret="";
+        $sql ="SELECT * FROM `news` ORDER BY `date` DESC";
+        $res = mysql_query($sql);
+        while($row=mysql_fetch_assoc($res)){
+            $tEx = new news($row['id']);
+            $ret.=$tEx->frontEnd();
+        }
+        return($ret);
+    }
+    
+    
+    function form($action="add"){
+        $tiny = new tinymce("content,shortdesc","adv_simp");
+        $ret = $tiny->script;
+        $ret.='<script type="text/javascript">
+        $(function(){
+        
+        $("#date").datepicker({"dateFormat":"dd-mm-yy", changeMonth: true,
+     changeYear: true,
+       });
+     ';
+    
+    if($action=="edit"){
+     $ret.="$('#newim').hide();
+        $('#imch').click(function(){
+           $('#newim').toggle(); 
+            
+        });
+     ";   
+    }
+    
+    $ret.='   
+    
+    });
+    </script>
+    ';
+    
+    
+        
+        
+        $ret.="<form action = '/jg-admin/actions/formProcess.php' enctype='multipart/form-data' method='post'><fieldset>";
+        $ret.="<input type='hidden' name='class' value='news' />";
+        $ret.="<input type='hidden' name='id' value='".$this->id."'/>";
+        $ret.="<input type='hidden' name='action' value='".$action."' />";
+        $ret.="<input type='hidden' name='ret' value='/jg-admin/admin.php?class=news' />";
+        $ret.="<table>";
+            $ret.="<tr><td>Title: </td><td><input type='text' class='the300' name='title' value='".$this->title."' /></td></tr>";
+           $ret.="<tr><td>Date: </td><td><input type='text' name='date' id='date' value='".$this->flipdate($this->date)."' /></td></tr>";
+             $ret.="<tr><td style='vertical-align:top;'>Short Description: </td><td><textarea name='shortdesc' id='shortdesc' rows='6' cols='40' width='500px'><div>".$this->shortdesc."</div></textarea></td></tr>";
+            
+            $ret.="<tr><td style='vertical-align:top;'>Details: </td><td><textarea name='content' id='content' rows='20' cols='40' width='500px'><div>".$this->content."</div></textarea></td></tr>";
+        
+            
+             $ret.="<tr><td colspan='2'><input type='submit' name='sC' value='Save News' /></td></tr>";
+        $ret.="</table></fieldset></form>";
+        return($ret);
+    }
+    
+    
+    function processForm(){
+        if($_POST['action']=="add"){
+            //$alias = new projectalias();
+            //$alias->makeAlias($_POST['name']);
+            $sql = "INSERT INTO `news` SET `title`='". mysql_real_escape_string(stripslashes(htmlentities($_POST['title'], ENT_QUOTES,'UTF-8',false)))."',
+            `shortdesc`='". mysql_real_escape_string(stripslashes(str_replace(array("<div>","</div>"),"",$_POST['shortdesc'])))."',
+            `date`='".$this->flipdate($_POST['date'])."',
+        
+            `content` = '".mysql_real_escape_string(stripslashes(str_replace(array("<div>","</div>"),"",$_POST['content'])))."'
+            ";
+            mysql_query($sql);
+            //$id = mysql_insert_id();
+            
+            
+            //$im = new image();
+            //$im->newsupload("/_temp","news",$id);
+            
+        }else{
+           
+           
+              $sql = "UPDATE `news` 
+              SET `title`='". mysql_real_escape_string(stripslashes(htmlentities($_POST['title'], ENT_QUOTES,'UTF-8',false)))."',
+           `shortdesc`='". mysql_real_escape_string(stripslashes(str_replace(array("<div>","</div>"),"",$_POST['shortdesc'])))."',
+            `date`='".$this->flipdate($_POST['date'])."',
+           
+            `content` = '".mysql_real_escape_string(stripslashes(str_replace(array("<div>","</div>"),"",$_POST['content'])))."'";
+          
+            
+            $sql.="
+            WHERE `id`='".$this->id."' LIMIT 1";
+                       
+            mysql_query($sql);
+            //if(isset($_POST['imch'])&&$_POST['imch']==1){
+             // $im = new image();
+            //$im->newsupload("/_temp","news",$this->id);  
+           // }
+            
+        }
+        
+       
+       //     return(mysql_insert_id());
+        //}
+        
+    }
+    
+    
+    function updateImage($file,$id){
+        $sql = "UPDATE `news` SET `image`='".$file."' WHERE `id`='".$id."' LIMIT 1";
+        mysql_query($sql);        
+    }
+    
+    
+    
+    
+    function flipdate($date=""){
+        if($date!=""){
+        $bits= explode("-",$date);
+        return($bits[2]."-".$bits[1]."-".$bits[0]);
+        
+        }
+    }
+    
+    
+            function admin(){
+        $sql = "SELECT * FROM `news` ORDER BY `date` DESC";
+        $res = mysql_query($sql);
+        $ret="<a href='/jg-admin/actions/add.php?class=news' class='falsebutton'><img src='/css/icons/add.png' alt='Add a news item' />Add News</a>";
+        $ret.="<table style='width:750px;'>
+            <tr><th>News Title</th><th>Actions</th></tr>";
+            $x=0;  
+        while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tNews = new news($row['id']);
+            $ptitle = $tNews->title;
+                
+            
+            $ret.="<tr".$c."><td style='text-align:center;'>".$ptitle."</td><td style='text-align:center;'>";
+      $ret.=" <a href='/jg-admin/actions/edit.php?class=news&id=".$tNews->id."'><img src='/css/icons/pencil.png' alt='Edit Page' /></a>";
+      $ret.=" | <a href='/jg-admin/actions/switcher.php?class=news&id=".$tNews->id."' title='";
+      $ret.=$tNews->archive==1?"Un-archive this news article":"Archive this article";
+      $ret.="'><img src='/css/icons/";
+      $ret.=$tNews->archive==1?"un":"";
+      $ret.="archive.png' /></a>";
+        
+               $pm = new pmeta();
+        if($pm->hasPmeta("news",$tNews->id)){
+            $ret.=" | <a href='/jg-admin/actions/edit.php?class=pmeta&type=news&typeid=".$tNews->id."'><img src='/css/icons/edittag.png' alt='Edit Metadata' /></a>";
+            
+        }else{
+            $ret.=" | <a href='/jg-admin/actions/add.php?class=pmeta&type=news&typeid=".$tNews->id."'><img src='/css/icons/addtag.png' alt='Add Metadata' /></a>";
+            
+        } 
+        
+       $ret.=" | <a href='/jg-admin/actions/delete.php?class=news&id=".$tNews->id."' title='Delete this News Article'><img src='/css/icons/bin_closed.png' /></a>";
+                    
+                $ret.="</td></tr>";
+            
+            
+            $x++;
+        }
+        $ret.="</table>";
+        
+        return($ret);
+    }
+    
+    function hp_summary(){
+        $sql ="SELECT * FROM `news` ORDER BY `date` DESC LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            return("");
+        }else{
+            $row = mysql_fetch_assoc($res);
+            return($row);
+        }
+    }
+    
+    
+    function to_content(){
+        if($this->id==""){
+            $ret = $this->get_news_list();
+        }else{
+            $ret = $this->get_article();
+        }
+        return($ret);
+        
+    }
+    
+    function get_news_list(){
+        
+        if($this->page!=""){
+            $offset = $this->page*$this->per_page; 
+        }else{
+            $offset=0;
+        }
+        $limit = " LIMIT ".$offset.",".$this->per_page;
+        
+        if($this->filter!=""){
+            if($this->filter=="archive"){
+                $filt = " WHERE `archive`='1' ";
+            }
+            if(is_numeric($this->filter)){
+                $filt = " WHERE YEAR(date) = '".$this->filter."' AND `archive`='0'";
+            }
+        }else{
+            $filt=" WHERE `archive`='0'";
+        }
+        
+        
+        $sql = "SELECT * FROM `news`".$filt." ORDER BY `date` DESC";
+        $sql.=$limit;
+        //echo $sql;
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            
+            while($row = mysql_fetch_assoc($res)){
+                $tcont = new news($row['id']);
+                $im = $tcont->strip_first_image();
+                $nali = new alias();
+$alias = $nali->makeAlias_nocheck($tcont->title);
+                $ret.='<!-- news item-->
+<div class="news_item">
+<span class="demi">'.$tcont->title.'</span><br /><br />
+
+<span class="grey">'.$tcont->reader_date($tcont->date).'</span><br /><br />
+
+'.$tcont->shortdesc.'<br /><br />
+
+<a href="/news/'.$tcont->date.'/'.$tcont->id.'/'.$alias.'/'.'">Read More...</a><br />
+
+'.$im.'
+
+<div class="newsdivider"></div>
+
+<!-- end news item-->
+</div>';
+            }
+           
+           
+        }
+        
+     $pag = new paging($this->page,$this->per_page,"news",$filt." ORDER BY `date` DESC","/news/");
+           $ret.=$pag->output;
+        //var_dump($pag);
+       return($ret); 
+        
+    }
+    
+    function strip_first_image(){
+        
+        preg_match_all('/<img ([^>]*)>/', $this->content, $result, PREG_PATTERN_ORDER);
+$result = $result[0];
+        //var_dump($result);
+        if(count($result)>0){
+            
+            
+            //return()
+            //$im = str_replace(array(""),array(""),"");
+            $string = $result[0];
+             $width = "";
+ $height = "";
+if (preg_match('/width="([0-9]*)"/', $string, $regs)) {
+	$width = $regs[1];
+} 
+ if (preg_match('/height="([0-9]*)"/', $string, $regs)) {
+	$height = $regs[1];
+}
+
+if($width > $height){
+    $patterns = array();
+  $patterns[0] = '/height="([0-9]*)"/';
+            $patterns[1] = '/width="([0-9]*)"/';
+            $replacements = array();
+            $replacements[1] ='width="215"';
+            $replacements[0] ='';
+            ksort($patterns);
+            ksort($replacements);
+            return("<br />".preg_replace($patterns, $replacements, $string));
+}else{
+     $patterns = array();
+  $patterns[0] = '/height="([0-9]*)"/';
+            $patterns[1] = '/width="([0-9]*)"/';
+            $replacements = array();
+            $replacements[0] ='height="135"';
+            $replacements[1] ='';
+            ksort($patterns);
+            ksort($replacements);
+            return("<br />".preg_replace($patterns, $replacements, $string)); 
+}
+            
+            
+            
+            /*
+            
+            $patterns[0] = '/height="([0-9]*)"/';
+            $patterns[1] = '/width="([0-9]*)"/';
+            $replacements[1] ='width="215"';
+            $replacements[0] ='height="135"';
+            return("<br />".preg_replace($patterns, $replacements, $result[0]));
+            */
+            
+            
+            
+            
+            
+            
+            
+        }else{
+            return("");
+        }
+    }
+    
+    
+    function get_article(){
+        $ret='<div id="article">
+<span class="demi">'.$this->title.'</span><br /><br />
+
+<span class="grey">'.$this->reader_date($this->date).'</span><br /><br />
+<p class="article_text">
+'.str_replace("<img","<img class='newsImage'",$this->content).'
+</p>
+';
+$share = new shares();
+$ret.=$share->output['0'];
+$ret.=$share->output['1'];
+$ret.'
+<!-- end news article-->
+</div>';
+return($ret);
+    }
+    
+    function reader_date($date=""){
+        if($date!=""){
+            return(date("j F Y",strtotime($date)));
+        }
+        
+    }
+ 
+ 
+    function for_leftnav(){
+        $ret='<div id="leftnavarea2">';
+        $sql = "SELECT DISTINCT YEAR(date) as `year` FROM `news` WHERE `archive`='0' ORDER BY `date` DESC";
+        $ret.="<div style='display:none;'>".$sql."</div>";
+        
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)>0){
+            $ret.="Filter by date<br />";
+            $dateLess2 = date("Y")-2;
+            
+            while($row = mysql_fetch_assoc($res)){
+                if($row['year']>$dateLess2){
+                $ret.="<a href='/news/year/".$row['year']."/'>".$row['year']."</a><br />";
+                }
+            }
+        }
+        
+        $sql2 = "SELECT `id` FROM `news` WHERE `archive`='1'";
+        $res2 = mysql_query($sql2);
+        if(mysql_num_rows($res2)<1){
+            
+        }else{
+            $ret.='<a href="/news/archive/">Archive</a>';
+        }
+        $ret.='
+
+
+<!-- end left nav 2-->
+</div>';
+return($ret);
+    }
+ 
+ 
+ function switcher($field="archive"){
+    if($this->archive==1){
+        $narchive = 0;
+    }else{
+        $narchive=1;
+    }
+    $sql = "UPDATE `news` SET `archive`='".$narchive."' WHERE `id`='".$this->id."' LIMIT 1";
+    mysql_query($sql);
+    
+ }
+ 
+         function delete(){
+            if($this->id!=""){
+                $sql = "DELETE FROM `news` WHERE `id`='".$this->id."'";
+                mysql_query($sql);
+            }
+        }
+    
+}
+
+?>

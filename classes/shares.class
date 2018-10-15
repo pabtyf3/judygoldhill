@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+
+class shares{
+    
+    var $output="";
+    
+    function __construct($pageTitle=""){
+        $this->populate();
+    }
+    
+    
+    function populate(){
+        
+       $encUrl = urlencode("http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+        
+        $linkdIn = 'http://www.linkedin.com/shareArticle?mini=true&url='.$encUrl;
+        $delic = 'http://delicious.com/save?v=5&amp;noui&amp;jump=close&amp;url='.$encUrl;
+        $goog='https://plusone.google.com/_/+1/confirm?url='.$encUrl.'';
+        $digg ='http://digg.com/submit?url='.$encUrl;
+        
+      /*  $ret.='<div id="shareOverlay">
+
+<div id="shareOverlayClose"><img src="/images/share_close.gif" width="9" height="9" alt="close" /></div>
+<div id="shareOverlayArrow"></div>
+
+<div id="shareLinksLeft">
+<ul class="shareListLeft">
+<li ><a class="shareListTwitter" href="http://www.twitter.com/share?url='.$encUrl.'" target="_blank">Twitter</a></li>
+<li><a class="shareListFacebook" href="http://www.facebook.com/sharer.php?u='.$encUrl.'"  target="_blank">Facebook</a></li>
+<li><a class="shareListLinkedIn" href="'.$linkdIn.'" target="_blank">LinkedIn</a></li>
+</ul>
+</div>
+
+<div id="shareLinksRight">
+<ul class="shareListRight">
+<li><a class="shareListDelic" href="'.$delic.'" target="_blank">Del.icio.us</a></li>
+<li><a class="shareListGoogle" href="'.$goog.'" target="_blank">Google+</a></li>
+<li><a class="shareListDig" href="'.$digg.'" target="_blank">Digg</a></li>
+</ul>
+</div>
+
+
+</div>';*/
+
+$link = '<a href="#shareOverlay" class="shareOverlayLink">Share</a>';
+$js = '<script type="text/javascript">
+$(function(){
+';
+    $js.='$("body").append(\'<div id="shareOverlay"><div id="shareOverlayClose"><img src="/images/share_close.gif" width="9" height="9" alt="close" /></div><div id="shareOverlayArrow"></div><div id="shareLinksLeft"><ul class="shareListLeft"><li ><a class="shareListTwitter" href="http://www.twitter.com/share?url='.$encUrl.'" target="_blank">Twitter</a></li><li><a class="shareListFacebook" href="http://www.facebook.com/sharer.php?u='.$encUrl.'"  target="_blank">Facebook</a></li><li><a class="shareListLinkedIn" href="'.$linkdIn.'" target="_blank">LinkedIn</a></li></ul></div><div id="shareLinksRight"><ul class="shareListRight"><li><a class="shareListDelic" href="'.$delic.'" target="_blank">Del.icio.us</a></li><li><a class="shareListGoogle" href="'.$goog.'" target="_blank">Google+</a></li><li><a class="shareListDig" href="'.$digg.'" target="_blank">Digg</a></li></ul></div></div>\');';
+
+$js.='    
+var shareOpen = false;
+//		   
+$("#shareOverlayClose").hover(function(){
+$(this).css("cursor", "pointer");
+});
+//
+$("#shareOverlayClose").click(function(){
+shareOpen = false;
+$("#shareOverlay").removeClass("on");
+});
+//
+$("a.shareOverlayLink").click(function(e){
+//alert("test");
+if (shareOpen==false) {
+    
+$("#shareOverlay").addClass("on");
+var tp =e.pageY - 150;
+var lt = e.pageX -30;
+$("#shareOverlay").css({top:tp+"px" ,left: lt+"px"})
+
+shareOpen = true;
+} else {
+	$("#shareOverlay").removeClass("on");
+	shareOpen = false;
+}
+
+
+})
+
+';
+$js.='
+})
+</script>';
+$this->output = array($link,$js);
+    }
+    
+    
+}
+
+?>

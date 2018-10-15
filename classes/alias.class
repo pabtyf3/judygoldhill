@@ -1,0 +1,143 @@
+<?php
+
+/**
+ * @author dotnet works
+ * @copyright 2012
+ */
+
+class alias{
+    var $id="";
+    var $pageid="";
+    var $alias="";
+    
+    
+    function __construct($al=""){
+        if($al!=""){
+            $this->alias=$al;
+            $this->populate();
+            
+        }
+    }
+    
+    
+    function populate(){
+        $sql ="SELECT * FROM `pagealias` WHERE `alias` ='".$this->alias."' ORDER BY `id` DESC LIMIT 1";
+        //echo $sql;
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            
+        $row = mysql_fetch_assoc($res);
+        foreach($row as $k=>$v){
+            $this->$k=$v;
+        }
+        
+        
+        
+        }        
+    }
+    
+    
+    function is_latest(){
+        $sql = "SELECT * FROM `pagealias` WHERE `pageid`='".$this->pageid."' ORDER BY `id` DESC";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)>1){
+         $sql = "SELECT * FROM `pagealias` WHERE `pageid`='".$this->pageid."' ORDER BY `id` DESC LIMIT 1";
+            $res = mysql_query($sql);
+            $row = mysql_fetch_assoc($res);
+            //header("Location:/");
+            return($row['alias']);
+        }else{
+            return($this->pageid);
+        }
+    }
+    
+    
+    function is_available($string="",$id=""){
+        if($string!=""){
+            $sql = "SELECT * FROM `pagealias` WHERE `alias` = '".$string."' LIMIT 1";
+            $res = mysql_query($sql);
+            if(mysql_num_rows($res)<1){
+                return(true);
+            }else{
+                return(false);
+            }
+        }
+    }
+   
+   
+       function makeAlias($sString) {
+        $string = str_replace(" & "," and ",$sString);   
+        $string = strtolower(htmlentities($sString));
+        $string = preg_replace("/&(.)(uml);/", "$1e", $string);
+        $string = preg_replace("/&(.)(acute|cedil|circ|ring|tilde|uml);/", "$1", $string);
+        $string = preg_replace("/([^a-z0-9]+)/", "-", html_entity_decode($string));
+        $string = trim($string, "-");
+           $sString2 = $string;
+            $string2=$string;
+       // echo $folder.$string2.".".$filetype;
+      // echo $string2."<br />";
+       $sql = "SELECT `alias` FROM `pagealias`";
+       $res = mysql_query($sql);
+       if(mysql_num_rows($res)<1){
+        //echo "No results";
+           return $string2;
+       }else{
+       while($row = mysql_fetch_assoc($res)){
+            $alii[]=$row['alias'];
+       }
+       }
+       
+      // var_dump($alii);
+         if(in_array($string2,$alii)){
+          //  echo "It's in the array<br />";
+            for($i=1;$i<100;$i++){
+              //  echo "Looping ";
+                 $x = $i;
+               //  echo $x."</br>";
+                //echo $folder.$string2."-".$x.".".$filetype;
+               if(in_array($string2."-".$x,$alii)){
+           // echo $string2."-".$x." is in the araray<br />";
+            $string2=$sString2;
+           
+        }else{
+            // echo $string2."-".$x." is NOT in the araray<br />";
+           if($x!=0){
+            $string = $sString2."-".$x;
+            }else{
+              $string = $sString2;  
+            }
+            break;
+        } 
+            }
+            }
+       
+       
+       
+       
+        
+        
+        return $string;
+        
+
+}
+    
+        function makeAlias_nocheck($sString) {
+        $string = str_replace(" & "," and ",$sString);   
+        $string = strtolower(htmlentities($sString));
+        $string = preg_replace("/&(.)(uml);/", "$1e", $string);
+        $string = preg_replace("/&(.)(acute|cedil|circ|ring|tilde|uml);/", "$1", $string);
+        $string = preg_replace("/([^a-z0-9]+)/", "-", html_entity_decode($string));
+        $string = trim($string, "-");
+           $sString2 = $string;
+            $string2=$string;
+   
+           return $string2;
+      
+}
+    
+    
+}
+
+?>

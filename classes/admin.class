@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+
+class admin{
+    
+    
+    function loginForm($error=""){
+    $ret = "<form action='' method='post' id='form'>
+    <fieldset>
+    ";
+    if($error!=""){
+        $ret.="<span class='errorMsg'>".$error."</span>";
+    }
+    $ret.="
+        <table class='formTable'>
+            <tr><td><label for='username'>Username: </label></td><td><input type='text' name='username' id='username' value='' /></td></tr>
+            <tr><td><label for='password'>Password: </label></td><td><input type='password' name='password' id='password' value='' /></td></tr>
+            <tr><td><input type='submit' name='sC' id='sC' value='Login' /></td><td></td></tr>
+        </table>";
+        //$cj = new common_jsScripts();
+        $ret.=$this->validate_required("username,password");
+        
+    $ret.="</fieldset>
+    </form>";
+    return($ret);
+}
+
+
+function try_login(){
+    
+  if($_POST['username']=="judy365"&&$_POST['password']=="365judy"){
+    
+   
+        //$row = mysql_fetch_assoc($res);
+       // $this->id = $row['id'];
+        //$this->populate();
+        $_SESSION['username']=$_POST['username'];
+        //$_SESSION['name']=$this->name;
+        $_SESSION['is_admin']="Yep";
+        return(true);
+   }else{
+    return(false);
+   } 
+    
+    
+    
+   // return(false);
+}
+
+function logout(){
+    unset($_SESSION['username']);
+    //unset($_SESSION['name']);
+    unset($_SESSION['is_admin']);
+    session_regenerate_id();
+    
+}
+   
+   
+       function validate_required($required=""){
+        $ret = "<script type='text/javascript'>";
+            $ret.="$(function(){
+                //$('#form').attr('onSubmit','return false;');
+                $('#sC').click(function(e){
+                    
+                    e.preventDefault();
+                                    $('.errorMsg').remove();
+                                  $('.missingField').removeClass('missingField');
+                var errors=0;
+                ";
+                    $bits = explode(",",$required);
+                    
+                    foreach($bits as $k=>$v){
+                        $ret.="if($('#".$v."').val().length <1){
+                            $('#".$v."').addClass('missingField');
+                            $('#".$v."').parent('td').append('<span class=\'errorMsg\'>* Required</span>');
+                        
+                            errors++;
+                            }";
+                    }
+                    
+                    
+            $ret.="
+            //alert(errors); 
+            if(errors!==0){ 
+            return(false);
+            }else{
+                //return(true);
+                $('#form').submit();
+                }
+                });
+                
+
+            })";
+        $ret.="</script>";
+        return($ret);
+    } 
+}
+
+?>

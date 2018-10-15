@@ -1,0 +1,26 @@
+Error codes
+
+0					-	No error
+1-99			-	Configuration error
+	1				-	This feature is disabled in current configuration
+	2				-	Operation on this file type not enabled in configuration
+100-199		-	File copy/move/delet/rename/create error
+	100			-	Source file not found
+	101			-	Destination file not found
+	102			-	Self copy (/var -> /var/tmp)
+	103			-	Create folder error
+	104			-	Destination type error (copy file to folder or vice versa)
+	105			-	Type of source or destionation not support (not file or folder)
+	106			-	Destination exist and can be overwriten (config settings)
+	107			-	Bad file name
+	110			-	Operation is fail by some reason
+200-299		-	File system permisions
+	200			-	Directory is write protect
+500-599		-	Upload error
+	500			-	Can't get free file name - stop upload
+	501			-	File type is not allowed. Based on file extension. - Illegal file type
+	502			-	File size exceeds the specified limit
+	503			-	Some error when move upload file
+	504			-	No free space left on device
+	505			-	File type is restricted. Based on file extension.
+	506			-	Local and remote file sizes do not match.

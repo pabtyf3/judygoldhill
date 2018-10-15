@@ -1,0 +1,35 @@
+RewriteEngine On
+RewriteBase /
+ErrorDocument 404 /404.php
+
+
+RewriteRule ^archived_site/$ archived_site/index.php
+RewriteRule ^news/year/([0-9]*)/([0-9]*)/$ news.php?filter=$1&page=$2
+RewriteRule ^news/([^/]*)/([0-9]*)/([^/]*)/$ /news.php?id=$2
+RewriteRule ^news/$ news.php 
+RewriteRule ^news/([0-9]*)/$ /news.php?page=$1
+RewriteRule ^news/archive/$ /news.php?filter=archive
+RewriteRule ^news/archive/([0-9]*)/$ news.php?filter=archive&page=$1
+RewriteRule ^news/year/([0-9]*)/$ news.php?filter=$1
+
+RewriteRule ^exhibitions/year/([0-9]*)/([0-9]*)/$ exhibitions.php?filter=$1&page=$2
+RewriteRule ^exhibitions/([0-9]*)/([^/]*)/$ /exhibitions.php?id=$1
+RewriteRule ^exhibitions/$ exhibitions.php 
+RewriteRule ^exhibitions/([0-9]*)/$ /exhibitions.php?page=$1
+RewriteRule ^exhibitions/archive/$ /exhibitions.php?filter=archive
+RewriteRule ^exhibitions/archive/([0-9]*)/$ exhibitions.php?filter=archive&page=$1
+RewriteRule ^exhibitions/year/([0-9]*)/$ exhibitions.php?filter=$1
+
+RewriteRule ^work/$ work.php
+RewriteRule ^work/([^/]*)/$ work.php?filter=$1
+RewriteRule ^work/([^/]*)/([0-9]*)/([^/]*)/$ workthumbs.php?id=$2
+
+RewriteRule ^work/([^/]*)/([0-9]*)/([^/]*)/info/$ workinfo.php?id=$2&view=info
+RewriteRule ^work/([^/]*)/([0-9]*)/([^/]*)/slideshow/$ workslides.php?id=$2&view=slideshow
+RewriteRule ^work/([^/]*)/([0-9]*)/([^/]*)/slideshow/([0-9]*)/$ workslides.php?id=$2&view=slideshow&slide=$4
+
+RewriteRule ^about_biog/$ /page.php?p=2
+RewriteRule ^about_cv/$ /page.php?p=3
+RewriteRule ^about_imprint/$ /page.php?p=4
+RewriteRule ^contact/$ /page.php?p=5
+

@@ -1,0 +1,312 @@
+<?php
+
+/**
+ * @author pabtyf
+ * @copyright 2012
+ */
+
+class slide{
+    
+    var $id="";
+    var $image="";
+    var $title="";
+    var $link="";
+    var $order="";
+    
+    
+    function __construct($id=""){
+        if($id!=""){
+            $this->id=$id;
+            $this->populate();
+        }
+    }
+    
+    
+    function populate(){
+        $sql = "SELECT * FROM `slide` WHERE `id`='".$this->id."'";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $row=mysql_fetch_assoc($res);
+            foreach($row as $k=>$v){
+                $this->$k=$v;
+            }
+        }
+    }
+    
+    
+ function admin(){
+        
+        $sql = "SELECT * FROM `slide` ORDER BY `order` ASC";
+       // echo $sql;
+        $res = mysql_query($sql);
+        $ret="<a href='/jg-admin/actions/add_slides.php' class='falsebutton'><img src='/css/icons/add.png' alt='Add a new Slide' />Add Slides</a>";
+       
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $ret.="<script type='text/javascript'>
+         
+            </script>";
+            $ret.="<form action='/jg-admin/actions/slide_update.php' method='post'><fieldset>";
+                  $ret.="<table style='width:900px;'>
+                  <tr><td></td><td></td><td></td><td><input type='submit' name='sC' value='Save Changes' /></td></tr>
+            <tr><th>Image</th><th>Title</th><th>Link</th><th>Order</th><th>Actions</th></tr>";
+            $x=0;  
+        while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tNews = new slide($row['id']);
+            $ptitle = $tNews->name;
+            $ret.="<tr".$c."><td style='text-align:center; padding:2px;'><img src='/images/slides/".$tNews->image."' height='80px' alt='".$tNews->title."' /></td>
+            <td style='vertical-align:middle; text-align:center;'><input type='text' name='title".$tNews->id."' value='".$tNews->title."' /></td>
+            <td style='vertical-align:middle; text-align:center;'><input type='text' name='link".$tNews->id."' value='".$tNews->link."' /></td>
+            <td style='vertical-align:middle; text-align:center;'><input type='text' name='order".$tNews->id."' style='width:3em;' value='".$tNews->order."' /></td>
+          <td style='text-align:center; vertical-align:middle;'>
+            <a href='/jg-admin/actions/delete.php?class=slide&id=".$tNews->id."'><img src='/css/icons/bin_closed.png' title='Delete Video' alt='Delete Video'/></a>
+            </td></tr>";
+            $x++;
+            } 
+            $ret.="</table></fieldset></form>"; 
+        }
+        return($ret);
+    }
+    
+    function uploadify(){
+        $ret = "  <script type='text/javascript' src='/js/uploadify2/jquery.uploadify-3.1.min.js'></script>
+	<title>Admin </title>
+       <script type='text/javascript'>
+$(document).ready(function() {
+    var upload1Done=0;
+    var upload2Done=0;
+    
+  $('#file_upload').uploadify({
+    'swf'  : '/js/uploadify2/uploadify.swf',
+    'uploader'    : '/js/uploadify2/uploadify_slide.php',
+    
+    'auto'      : false,
+    'multi'     : true,
+    'onUploadSuccess' : function(file,data,response) {
+     // alert(data.filesUploaded + ' files uploaded successfully!');
+      //upload1Done=1;
+      return(true);
+     
+    },
+    'formData' :{'project_id':'".time()."'}
+  });
+
+  $('#upload_queue2').click(function(){
+   $('#file_upload').uploadify('upload','*');
+    //$('#file_upload2').uploadifyUpload();
+  
+    $('#nextStep').attr('disabled',false);
+    
+    
+   
+     //
+  })
+  $('#nextStep').click(function(){
+    window.location = '/jg-admin/admin.php?class=slide';
+  });
+});
+
+    </script>
+    <link rel='stylesheet' type='text/css' href='/js/uploadify2/uploadify.css' />";
+    
+    $ret.='       <h1>Select images to upload</h1><br /><br /><div id="file_upload">
+
+</div><span style="display: block; height:20px;"></span>
+<input type="button" id="upload_queue2" value="Upload Selected Files"/>
+<br /><br />
+<input type="button" id="nextStep" value="Continue.." disabled="disabled" /> 
+  ';
+  return($ret);
+    
+    }
+       function add($file="",$project=""){
+        //$pro = new project($project);
+        list($width, $height, $type, $attr) = getimagesize($_SERVER['DOCUMENT_ROOT']."/images/slides/".$file);
+        $sql = "INSERT INTO `slide` SET `image`='".$file."',`width`='".$width."',`height`='".$height."'";
+        
+        
+        
+      $handle=  fopen($_SERVER['DOCUMENT_ROOT']."/debug.txt","a");
+        fwrite($handle,$sql."<br/>");
+        fclose($handle);
+        mysql_query($sql);
+        
+    } 
+    
+        function updateImages(){
+           // $handle = fopen($_SERVER['DOCUMENT_ROOT']."/slidedebug.txt","w");
+            $string = "";
+        foreach($_POST as $k=>$v){
+            $string.="\$_post['".$k."']=".$v."\r\n";
+            if(strpos($k,"rder")){
+              $id = preg_replace("/[^0-9]/", '', $k);
+                $sql ="UPDATE `slide` SET `order`='".$v."' WHERE `id`='".$id."'";
+                $string.=$sql."\r\n";
+                mysql_query($sql);
+            }elseif(strpos($k,"itle")){
+                $id = preg_replace("/[^0-9]/", '', $k);
+                $sql ="UPDATE `slide` SET `title`='".$v."' WHERE `id`='".$id."'";
+                $string.=$sql."\r\n";
+                mysql_query($sql); 
+            }elseif(strpos($k,"ink")){
+                $id = preg_replace("/[^0-9]/", '', $k); #str_replace("link",$k);
+                $sql = "UPDATE `slide` SET `link`='".$v."' WHERE `id`='".$id."'";
+                $string.=$sql."\r\n";
+                mysql_query($sql); 
+            }
+        }
+        ///fwrite($handle,$string);
+        //fclose($handle);
+        
+    }
+    
+
+  
+  
+  
+  
+  
+  function newSlideshow(){
+    $ret='<link href="/css/newSlides.css" rel="stylesheet" type="text/css" />
+    <div id="slides">
+<ul id="slides_container" style="width: 100%;">';
+    $sql = "SELECT * FROM `slide` ORDER BY `order` ASC";
+    $res = mysql_query($sql);
+    $x=1;
+    while($row = mysql_fetch_assoc($res)){
+        $ret.='<li class="swrap" id="swrap'.$x.'">';
+            
+            if($row['link']!=""){
+            $ret.='<a href="'.$row['link'].'" class="slideLink" >';
+        }
+        $ret.='<img class="rSlide" title="'.$row['title'].'" src="/images/slides/'.$row['image'].'" style="max-height:100%; max-width: 100%;" alt="'.$row['title'].'" id="slide'.$x.'"/>';
+        if($row['link']!=""){
+            $ret.='</a>';
+        }
+        
+        $ret.='
+    </li>';
+    $x++;
+    }
+    $ret.='</ul>
+
+
+</div>';
+    
+    
+    $ret.= '
+ <script type="text/javascript" src="/js/nyroModal-1/js/jquery.nyroModal-1.6.2.min.js"></script>
+    <script src="/js/newSlideshow.js" type="text/javascript"></script>
+<script src="/js/touchwipe.1.1.1.js" type="text/javascript"></script>
+       <script type="text/javascript">
+     $(function(){
+        auto="auto";
+       initSlides(1);
+        //alert("TESTING");
+     })
+     
+   
+    </script> 
+
+';
+return($ret);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      function hpSlideshow(){
+        
+        
+       // var_dump($this->images);
+      $ret= "<div id='slides'>
+<div class='slides_container'>";
+       $sql = "SELECT * FROM `slide` ORDER BY `order`";
+       $res = mysql_query($sql);
+       $x=1;
+       while($row = mysql_fetch_assoc($res)){
+      
+        $tSlide = new slide($row['id']);
+          $ret.=$tSlide->asSlide($x);
+          $x++;
+       }
+       
+
+   
+$ret.="</div>
+
+<p class='slide_count'><span class='current'>";
+$ret.=isset($_GET['slide'])?$_GET['slide']:"1";
+$ret.=" / ".$this->numSlides()."</span><br /></p>
+
+<p class='galleryinfo' />
+</div>";
+       
+ return($ret);      
+       
+       
+    }
+  
+  
+  function asSlide($slideNo=""){
+    
+            
+$ret="<div class='sWrap'>";
+if($this->link!=""){
+    $ret.="<a href='".$this->link."'>";
+}
+$ret.="<img src='/images/slides/".$this->image."'  alt='";
+$ret.=$this->caption1.", ".$this->caption2.", ".$this->caption3;
+$ret.="' border='0' ";
+list($width, $height, $type, $attr) = getimagesize($_SERVER['DOCUMENT_ROOT']."/images/slides/".$this->image);
+$ret.= "height='".$height."px' ";
+$ret.=" class='rSlide'/>";
+if($this->link!=""){
+    $ret.="</a>";
+}
+
+$ret.="<p class='galleryinfo' />
+".$this->caption1."<br />".$this->caption2."<br />".$this->caption3."
+<input type='hidden' name='rSlid".$slideNo."' class='wid' id='rSlid".$slideNo."' value='".$width."' /><br /><br />
+";
+if($this->link!=""){
+    $ret.="<a href='".$this->link."'>".$this->linktext."</a>";
+}
+$ret.="</div>";
+  return($ret);
+  }
+  
+  
+  function numSlides(){
+    $sql ="SELECT `id` FROM `slide` ORDER BY `order`";
+    $res = mysql_query($sql);
+    return(mysql_num_rows($res));
+  }
+          function delete(){
+            if($this->id!=""){
+                $sql = "DELETE FROM `slide` WHERE `id`='".$this->id."'";
+                mysql_query($sql);
+            }
+        }
+    
+}
+
+?>

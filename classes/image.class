@@ -1,0 +1,816 @@
+<?php
+
+
+class image{
+    
+       var $appendage = "_thumb"; //added to thumbnail images to define them as thumbs.
+    
+    
+    
+    /**
+     * uploads image to temp path (ITP constant defined in config.inc file.);
+     * */
+     function upload($targetFolder="",$type="projectimage"){   
+        
+if (!empty($_FILES)) {
+	$tempFile = $_FILES['Filedata']['tmp_name'];
+	$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
+	$targetFile = rtrim($targetPath,'/') . '/' .$_POST['project_id']."_" .$_FILES['Filedata']['name'];
+	$fName = $_POST['project_id']."_" .$_FILES['Filedata']['name'];
+	// Validate the file type
+	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileParts = pathinfo($_FILES['Filedata']['name']);
+	
+	if (in_array($fileParts['extension'],$fileTypes)) {
+		move_uploaded_file($tempFile,$targetFile);
+         list($width, $height, $type, $attr) = getimagesize($targetFile);
+    if($width>$height){
+        #landscape
+        if($width/$height>1.75){
+            #it's not 4/3
+            $this->fixedWidthResize($targetFile,1084,$_SERVER['DOCUMENT_ROOT']."/images/projects/",false);
+            $this->fixedHeightResize($targetFile,118,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+        }else{
+            #it is 4/3
+             $this->fixedHeightResize($targetFile,800,$_SERVER['DOCUMENT_ROOT']."/images/projects/",false);
+            $this->fixedHeightResize($targetFile,136,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+        }
+    }else{
+        #portrait
+        $this->fixedHeightResize($targetFile,800,$_SERVER['DOCUMENT_ROOT']."/images/projects/",false);
+             $this->fixedHeightResize($targetFile,136,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+        
+    }
+         
+    
+
+//$this->fixedWidthResize($targetFile,290,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+$img = new projectimage();
+$img->add($fName,$_POST['project_id']);
+echo "1";
+	} else {
+		echo 'Invalid file type.';
+	}
+}
+return($targetFile);
+
+    }
+    
+
+     function upload_slide($targetFolder="",$type="projectimage"){   
+        
+if (!empty($_FILES)) {
+	$tempFile = $_FILES['Filedata']['tmp_name'];
+	$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
+	$targetFile = rtrim($targetPath,'/') . '/' .$_POST['project_id']."_" .$_FILES['Filedata']['name'];
+	$fName = $_POST['project_id']."_" .$_FILES['Filedata']['name'];
+	// Validate the file type
+	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileParts = pathinfo($_FILES['Filedata']['name']);
+	
+	if (in_array($fileParts['extension'],$fileTypes)) {
+		move_uploaded_file($tempFile,$targetFile);
+         list($width, $height, $type, $attr) = getimagesize($targetFile);
+    if($width>$height){
+        #landscape
+        if($width/$height>1.75){
+            #it's not 4/3
+            $this->fixedWidthResize($targetFile,1084,$_SERVER['DOCUMENT_ROOT']."/images/slides/",false);
+            $this->fixedHeightResize($targetFile,118,$_SERVER['DOCUMENT_ROOT']."/images/slides/thumbs/",false);
+        }else{
+            #it is 4/3
+             $this->fixedHeightResize($targetFile,800,$_SERVER['DOCUMENT_ROOT']."/images/slides/",false);
+            $this->fixedHeightResize($targetFile,136,$_SERVER['DOCUMENT_ROOT']."/images/slides/thumbs/",false);
+        }
+    }else{
+        #portrait
+        $this->fixedHeightResize($targetFile,800,$_SERVER['DOCUMENT_ROOT']."/images/slides/",false);
+             $this->fixedHeightResize($targetFile,136,$_SERVER['DOCUMENT_ROOT']."/images/slides/thumbs/",false);
+        
+    }
+         
+    
+
+//$this->fixedWidthResize($targetFile,290,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+$img = new slide();
+$img->add($fName,$_POST['project_id']);
+echo "1";
+	} else {
+		echo 'Invalid file type.';
+	}
+}
+return($targetFile);
+
+    }
+
+     function exhibupload($targetFolder="",$type="exhibitions",$id=""){   
+        
+if (!empty($_FILES)&&$_FILES['image']['name']!="") {
+	$tempFile = $_FILES['image']['tmp_name'];
+	$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
+	$targetFile = rtrim($targetPath,'/') . '/' .$id."_" .$_FILES['image']['name'];
+	$fName = $id."_" .$_FILES['image']['name'];
+	// Validate the file type
+	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileParts = pathinfo($_FILES['image']['name']);
+	
+	if (in_array($fileParts['extension'],$fileTypes)) {
+		move_uploaded_file($tempFile,$targetFile);
+        
+ //   $this->fixedHeightResize($targetFile,600,$_SERVER['DOCUMENT_ROOT']."/images/projects/",false);
+//$this->fixedHeightResize($targetFile,160,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+$this->fixedHeightResize($targetFile,600,$_SERVER['DOCUMENT_ROOT']."/images/exhibitions/",false);
+$this->fixedWidthResize($targetFile,290,$_SERVER['DOCUMENT_ROOT']."/images/exhibitions/thumbs/",false);
+$img = new exhibition();
+$img->updateImage($fName,$id);
+//echo "1";
+	} else {
+		//echo 'Invalid file type.';
+	}
+return($targetFile);
+}
+
+
+    }
+
+
+     function newsupload($targetFolder="",$type="news",$id=""){   
+        
+if (!empty($_FILES)&&$_FILES['image']['name']!="") {
+	$tempFile = $_FILES['image']['tmp_name'];
+	$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
+	$targetFile = rtrim($targetPath,'/') . '/' .$id."_" .$_FILES['image']['name'];
+	$fName = $id."_" .$_FILES['image']['name'];
+	// Validate the file type
+	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileParts = pathinfo($_FILES['image']['name']);
+	
+	if (in_array($fileParts['extension'],$fileTypes)) {
+		move_uploaded_file($tempFile,$targetFile);
+        
+ //   $this->fixedHeightResize($targetFile,600,$_SERVER['DOCUMENT_ROOT']."/images/projects/",false);
+//$this->fixedHeightResize($targetFile,160,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+$this->fixedWidthResize($targetFile,290,$_SERVER['DOCUMENT_ROOT']."/images/news/",false);
+$img = new news();
+$img->updateImage($fName,$id);
+//echo "1";
+	} else {
+		//echo 'Invalid file type.';
+	}
+    return($targetFile);
+}
+
+
+    }
+    
+    
+         function slideupload($targetFolder="/_temp",$type="slide",$id=""){   
+        
+if (!empty($_FILES)&&$_FILES['image']['name']!="") {
+
+	$tempFile = $_FILES['image']['tmp_name'];
+	$targetPath = $_SERVER['DOCUMENT_ROOT'] . $targetFolder;
+	$targetFile = rtrim($targetPath,'/') . '/' .$id."_" .$_FILES['image']['name'];
+	$fName = $id."_" .$_FILES['image']['name'];
+	// Validate the file type
+	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileParts = pathinfo($_FILES['image']['name']);
+	
+	if (in_array($fileParts['extension'],$fileTypes)) {
+		move_uploaded_file($tempFile,$targetFile);
+        
+    $this->fixedHeightResize($targetFile,600,$_SERVER['DOCUMENT_ROOT']."/images/slides/",false);
+//$this->fixedHeightResize($targetFile,160,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+//$this->fixedWidthResize($targetFile,290,$_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/",false);
+$img = new slide();
+$img->updateImage($fName,$id);
+//echo "1";
+	} else {
+//		echo 'Invalid file type.';
+	}
+return($targetFile);
+}
+
+
+    }
+    
+    
+    
+    
+   /**
+    * Creates a readable filename from crap user named file.
+    
+    * */
+   private function makeAlias($sString) {
+       /* $string = str_replace(" & "," and ",$sString);   
+        $string = strtolower(htmlentities($sString));
+        $string = preg_replace("/&(.)(uml);/", "$1e", $string);
+        $string = preg_replace("/&(.)(acute|cedil|circ|ring|tilde|uml);/", "$1", $string);
+        $string = preg_replace("/([^a-z0-9]+)/", "-", html_entity_decode($string));
+        $string = trim($string, "-");
+           $sString2 = $string;
+            $string2=$string;
+       //echo $folder.$string2.".".$filetype;
+       
+         
+            for($i=1;$i<100;$i++){
+                 $x = $i-1;
+                echo $folder.$string2."-".$x.".".$filetype;
+               if(file_exists($folder.$string2."-".$x.".".$filetype)){
+            
+            $string2=$sString2;
+           
+        }else{
+           
+            $string = $sString2."-".$x;
+            break;
+        } 
+            }
+       
+       
+       */
+       
+        //$alias = new alias($sString,);
+        
+        
+       // return md5($sString.time());
+        
+
+}
+
+
+/**
+ * Actually creates the image..
+ * 
+ * */
+
+    private function createNewImage($src="",$srcx="",$srcy="",$srcw="",$srch="",$desx=0,$desy=0,$desw="",$desh="",$dest=""){
+		$attribs = getimagesize($src); 
+		switch($attribs['mime']){
+	case"image/jpeg":
+	$or_image = @imagecreatefromjpeg($src); 
+	break;
+	case"image/gif":
+	$or_image = @imagecreatefromgif($src); 
+	break;
+	case"image/png":
+	$or_image = @imagecreatefrompng($src); 
+	break;
+	}
+	
+	$ts_image = imagecreatetruecolor($desw, $desh);
+	
+	imagecopyresampled($ts_image, $or_image, $desx, $desy, $srcx, $srcy, $desw, $desh, $srcw, $srch);
+		
+	imagejpeg($ts_image,$dest, 100);
+	imagedestroy($or_image);
+	imagedestroy($ts_image);
+	//unlink($src);	
+	return(true);
+	}
+    
+    
+    
+    
+   function newResize($imageSRC,$max,$dfolder,$isThumb=true,$cons=false){
+    #for this one max can only be max dimensions w x h e.g. 600x400 
+   $handle = fopen($_SERVER['DOCUMENT_ROOT']."/newResizeDegug.txt","w") or die();
+  list($width, $height, $type, $attr) = getimagesize($imageSRC);
+  
+  $origWidth = $width;
+  $origHeight = $height;
+$debug = "Original Width:".$origWidth."\r\n";
+$debug = "Original Height:".$origHeight."\r\n";
+
+    
+    $bits = explode("x",$max);
+
+$maxResizeHeight = $bits[1];
+$maxResizeWidth = $bits[0];
+$debug = "Max Width:".$maxResizeWidth."\r\n";
+$debug = "Max Height:".$maxResizeHeight."\r\n";
+  // Change dimensions to fit maximum width and height
+  $resizedWidth = $origWidth;
+  $resizedHeight = $origHeight;
+ $debug = "Resized Width:".$resizedWidth."\r\n";
+$debug = "Resized Height:".$resizedHeight."\r\n"; 
+ 
+  if($resizedWidth > $maxResizeWidth) {
+    $aspectRatio = $maxResizeWidth / $resizedWidth;
+    $resizedWidth = round($aspectRatio * $resizedWidth);
+    $resizedHeight = round($aspectRatio * $resizedHeight);
+    $debug.="Resized Width is greater than Max:\r\n";
+     $debug = "Resized Width:".$resizedWidth."\r\n";
+$debug = "Resized Height:".$resizedHeight."\r\n"; 
+  }
+  
+  if($resizedHeight > $maxResizeHeight) {
+    $aspectRatio = $maxResizeHeight / $resizedHeight;
+    $resizedWidth = round($aspectRatio * $resizedWidth);
+    $resizedHeight = round($aspectRatio * $resizedHeight);
+        $debug.="Resized Height is greater than Max:\r\n";
+     $debug = "Resized Height:".$resizedWidth."\r\n";
+$debug = "Resized Height:".$resizedHeight."\r\n"; 
+  }
+
+
+    if($resizedHeight>$maxResizeHeight){
+        #if it's still wrong
+        $aspectRatio = $maxResizeHeight / $origHeight;
+        $resizedWidth = round($aspectRatio * $origWidth);
+    $resizedHeight = round($aspectRatio * $origHeight);
+            $debug.="Resized Height is Still greater than Max:\r\n";
+     $debug = "Resized Width:".$resizedWidth."\r\n";
+$debug = "Resized Height:".$resizedHeight."\r\n"; 
+    }
+ fwrite($handle,$debug);
+ fclose($debug);   
+   $srcx=0;
+        $srcy=0;
+  
+  
+  
+   $b = explode("/",$imageSRC);
+    $nName = explode(".",$b[count($b)-1]);
+    $poppage = array_pop($nName);
+    //var_dump($nName);
+    if($isThumb==true){
+       
+    $nn = $nName['0'].$this->appendage;
+    }else{
+    $nn = $nName['0'];
+    }
+    //echo $this->appendage;
+    $path = $dfolder;
+    $newImageName = $nn.".jpg";
+    $ninwop = $newImageName;
+    $newImageName = $dfolder.$ninwop;
+//echo $newImageName;
+    $this->createNewImage($imageSRC,$srcx,$srcy,$width,$height,0,0,$resizedWidth,$resizedHeight,$newImageName);
+    return($newImageName);
+  
+   } 
+    
+   
+   function fixResize($maxWidth="",$maxHeight="",$curWidth="",$curHeight="",$imageSRC="",$dfolder="",$isThumb=true,$cons=false){
+    
+ 
+    $wideaspectRatio = $maxWidth / $curWidth;
+    $wide['resizedWidth'] = round($wideaspectRatio * $curWidth);
+    $wide['resizedHeight'] = round($wideaspectRatio * $curHeight);
+ 
+  
+    $tallaspectRatio = $maxHeight / $curHeight;
+    $tall['resizedWidth'] = round($tallaspectRatio * $curWidth);
+    $tall['resizedHeight'] = round($tallaspectRatio * $curHeight);
+    
+    if($wide['resizedHeight']>$maxHeight){
+        
+        $this->fixedHeightResize($imgSRC,$maxHeight,$dfolder,$isThumb,$cons);
+    }else{
+        $this->fixedWidthResize($imgSRC,$maxWidth,$dfolder,$isThumb,$cons);
+    }
+    
+
+   }
+   
+   
+    
+    
+       function fixedHeightResize($imageSRC,$max,$dfolder,$isThumb=true,$cons=false){
+    #for this one max can only be max dimensions w x h e.g. 600x400 
+    
+  list($width, $height, $type, $attr) = getimagesize($imageSRC);
+  
+  $origWidth = $width;
+  $origHeight = $height;
+
+    
+    //$bits = explode("x",$max);
+
+$maxResizeHeight = $max;
+//$maxResizeWidth = $bits[0];
+
+  // Change dimensions to fit maximum width and height
+  $resizedWidth = $origWidth;
+  $resizedHeight = $origHeight;
+/*  if($resizedWidth > $maxResizeWidth) {
+    $aspectRatio = $maxResizeWidth / $resizedWidth;
+    $resizedWidth = round($aspectRatio * $resizedWidth);
+    $resizedHeight = round($aspectRatio * $resizedHeight);
+  }
+  if($resizedHeight > $maxResizeHeight) {*/
+    $aspectRatio = $maxResizeHeight / $resizedHeight;
+    $resizedWidth = round($aspectRatio * $resizedWidth);
+    $resizedHeight = round($aspectRatio * $resizedHeight);
+ // }
+   $srcx=0;
+        $srcy=0;
+  
+  
+  
+   $b = explode("/",$imageSRC);
+    $nName = explode(".",$b[count($b)-1]);
+    $poppage = array_pop($nName);
+    //var_dump($nName);
+    if($isThumb==true){
+       
+    $nn = $nName['0'].$this->appendage;
+    }else{
+    $nn = $nName['0'];
+    }
+    //echo $this->appendage;
+    $path = $dfolder;
+    $newImageName = $nn.".jpg";
+    $ninwop = $newImageName;
+    $newImageName = $dfolder.$ninwop;
+//echo $newImageName;
+    $this->createNewImage($imageSRC,$srcx,$srcy,$width,$height,0,0,$resizedWidth,$resizedHeight,$newImageName);
+    return($newImageName);
+  
+   } 
+    
+  
+  
+         function fixedWidthResize($imageSRC,$max,$dfolder,$isThumb=true,$cons=false){
+    #for this one max can only be max dimensions w x h e.g. 600x400 
+    
+  list($width, $height, $type, $attr) = getimagesize($imageSRC);
+  
+  $origWidth = $width;
+  $origHeight = $height;
+
+  $maxResizeWidth = $max;
+
+  $resizedWidth = $origWidth;
+  $resizedHeight = $origHeight;
+
+    $aspectRatio = $maxResizeWidth / $resizedWidth;
+    $resizedWidth = round($aspectRatio * $resizedWidth);
+    $resizedHeight = round($aspectRatio * $resizedHeight);
+
+   $srcx=0;
+        $srcy=0;
+  
+  
+  
+   $b = explode("/",$imageSRC);
+    $nName = explode(".",$b[count($b)-1]);
+    $poppage = array_pop($nName);
+    //var_dump($nName);
+    if($isThumb==true){
+       
+    $nn = $nName['0'].$this->appendage;
+    }else{
+    $nn = $nName['0'];
+    }
+    //echo $this->appendage;
+    $path = $dfolder;
+    $newImageName = $nn.".jpg";
+    $ninwop = $newImageName;
+    $newImageName = $dfolder.$ninwop;
+//echo $newImageName;
+    $this->createNewImage($imageSRC,$srcx,$srcy,$width,$height,0,0,$resizedWidth,$resizedHeight,$newImageName);
+    return($newImageName);
+  
+   } 
+ 
+  
+    
+    
+  function resize($imageSRC,$max,$dfolder,$isThumb=true,$cons=false){
+
+    list($width, $height, $type, $attr) = getimagesize($imageSRC);
+
+    // $max can be an array in which case it will hold Thumbnail width, thumbnail height, srcx,srcy,src witdth, src height.
+
+    if(!is_array($max)){
+        
+        $maxBits = explode("x",$max);
+        
+
+        if($width>$height){$aspectName = "landscape"; $aspect = "".$width."/".$height."";
+        $max = $this->splitMax($max,$aspectName);
+            $rat = $max/$width;
+       
+            
+            $tnWidth = $width*$rat;
+            $tnHeight = $height*$rat;
+
+        }
+        if($width<$height){$aspectName = "portrait"; $aspect = "".$width."/".$height."";
+        $max = $this->splitMax($max,$aspectName);
+            $rat = $max/$height;
+          
+            $tnWidth = $width*$rat;
+            $tnHeight = $height*$rat;
+
+        }
+        if($width==$height){$aspectName = "square";$aspect = "1";
+        $max = $this->splitMax($max,$aspectName);
+        
+            $tnWidth = $max;
+            $tnHeight = $max;
+        }
+        $srcx=0;
+        $srcy=0;
+    }else{
+        $tnWidth = $max[0];
+        $tnHeight = $max[1];
+        $srcx=$max[2];
+        $srcy=$max[3];
+        $width = $max[4];
+        $height = $max[5];
+    }
+
+    $b = explode("/",$imageSRC);
+    $nName = explode(".",$b[count($b)-1]);
+    $poppage = array_pop($nName);
+    //var_dump($nName);
+    if($isThumb==true){
+       
+    $nn = $nName['0'].$this->appendage;
+    }else{
+    $nn = $nName['0'];
+    }
+    //echo $this->appendage;
+    $path = $dfolder;
+    $newImageName = $nn.".jpg";
+    $ninwop = $newImageName;
+    $newImageName = $dfolder.$ninwop;
+//echo $newImageName;
+    $this->createNewImage($imageSRC,$srcx,$srcy,$width,$height,0,0,$tnWidth,$tnHeight,$newImageName);
+    return($newImageName);
+	}
+    
+    
+    
+    function splitMax($max, $aspect){
+          if(strpos($max,"x")){
+            $b = explode("x",$max);
+            if($b[0]<=$b[1]){
+                $max =$b[0]; 
+            }else{
+                $max = $b[1];
+            }
+            
+            
+            if($aspect == "landscape"){
+                return($b[0]);
+            }
+            if($aspect == "portrait"){
+                return($b[1]);
+            }
+            if($aspect == "square"){
+                return($b[1]);
+            }
+    
+            
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    function form(){
+       
+
+        $ret = "<form action='uploadImage.php' enctype='multipart/form-data' method='post' id='imagePost'>";  
+ 
+        
+        
+   
+    $ret.="<fieldset><table>";
+    $ret.="<tr><td><label for='imageFile'>Choose Image:</label></td><td><input type='file' id='imageFile' name='imageFile' value=''/></td></tr>";
+    $ret.="<tr><td><label for='imageTitle'>Image Title:</label></td><td><input type='text' name='imageTitle' id='imageTitle' value=''/></td></tr>";
+    $ret.="<tr><td>";
+
+
+        $ret.="<input type='hidden' name='uploadPath' value='../tempImages/'/>";
+        //$ret.="<input type='hidden' name='size' value='".PIS."'/>";
+       // $ret.="<input type='hidden' name='thumbSize' value='".PIT."'/>";
+        //$ret.="<input type='hidden' name=''"
+    $ret.="<input type='hidden' value='".$_GET['plantID']."' name='ProductID' />";
+    if(isset($_GET['page'])){
+        $ret.="<input type='hidden' value='".$_GET['page']."' name='backto'/>";
+    }
+    
+    $ret.="<input type='submit' name='submit' value='Upload' /></td><td></td></tr></table></fieldset></form>";
+    return($ret);
+   } 
+    
+    function crop($newImage="",$cropSize=""){
+      $newname = $newImage;  
+        
+        
+         
+    //$image = new dnwImage;
+    list($width, $height, $type, $attr) = getimagesize($newname);
+    if(strpos($cropSize,"x")){
+            $cs = explode("x",$cropSize);
+    
+    }else{
+           $cs[0] = $cropSize;
+           $cs[1] = $cropSize;
+    
+    }
+    $aspect = $cs[0]."/".$cs[1];
+    
+    //echo $aspect;
+
+    $rettable = "<table>
+<tr><td colspan='3'>";
+ if($width>800||$height>600){
+	$w2 = $width/2;
+	$h2=$height/2;
+$rettable.="<img src='".$newname."' id='cropbox' style='width:".$w2."px; height='".$h2."px' />";
+
+	
+	}else{
+		$rettable.="<img src='".$newname."' id='cropbox'  />";
+	}
+$rettable.="
+
+</td></tr>
+<tr><td><div style='width:".$cs[0]."px; height:".$cs[1]."px; overflow:hidden; border:2px solid grey;'>
+
+			<img src='".$newname."'  id='preview1' />
+		</div></td><td>
+	
+		</td><td></td></tr>
+</table>
+<form action='addgallImage.php' method='post'>
+<fieldset style='border:0px;'>
+<input type='hidden' name='src' value='".$newname."' />
+<input type='hidden' name='x' id='x' value='' />
+<input type='hidden' name='y' id='y' value='' />
+<input type='hidden' name='width' id='w' value='' />
+<input type='hidden' name='height' id='h' value='' />
+<input type='hidden' name='tnWidth' value='".$cs[0]."'/>
+<input type='hidden' name='tnHeight' value='".$cs[1]."'/>";
+
+if(eregi("add-new-show",$_SERVER['PHP_SELF'])){
+$rettable.="<label for='another'>Do you want to upload another image after this?</label><input type='checkbox' name='another' value='1' checked='' />";
+}
+
+
+$rettable.="
+<input type='submit' name='processImage' value='Next..' />
+</fieldset>
+</form>";
+    
+    
+    
+    	$jc ="		// Remember to invoke within jQuery(window).load(...)
+			// If you don't, Jcrop may not initialize properly
+			jQuery(window).load(function(){
+
+				jQuery('#cropbox').Jcrop({
+					onChange: showPreview, 
+					onSelect: showCoords,
+					aspectRatio: ".$aspect."
+				});
+
+			});
+
+			// Our simple event handler, called from onChange and onSelect
+			// event handlers, as per the Jcrop invocation above
+			function showCoords(c)
+			{";
+			
+					if($width>800||$height>600){
+				
+			$jc.="
+					jQuery('#x').val(c.x*2);
+				jQuery('#y').val(c.y*2);
+				jQuery('#x2').val(c.x2*2);
+				jQuery('#y2').val(c.y2*2);
+				jQuery('#w').val(c.w*2);
+				jQuery('#h').val(c.h*2);	
+				";	
+				
+				 
+				}else{
+				$jc.="
+				jQuery('#x').val(c.x);
+				jQuery('#y').val(c.y);
+				jQuery('#x2').val(c.x2);
+				jQuery('#y2').val(c.y2);
+				jQuery('#w').val(c.w);
+				jQuery('#h').val(c.h);
+				";
+				}
+				$jc.="
+			};
+
+			
+			
+			function showPreview(coords)
+			{
+				if (parseInt(coords.w) > 0)
+				{
+					";
+                     
+					if($width>800||$height>600){
+				
+			$jc.="
+					
+					var rx1 = ".$cs[0]." / (coords.w*2);
+					var ry1 = ".$cs[1]." / (coords.h*2);
+					";
+					 
+					}else{
+					
+					$jc.="
+					var rx1 = ".$cs[0]." / coords.w;
+					var ry1 = ".$cs[1]."/ coords.h;
+				
+					
+					"; }
+                    
+                    
+ 
+	if($width>800||$height>600){
+		$jc.="
+			jQuery('#preview1').css({
+						width: Math.round(rx1 * ".$width.") + 'px',
+						height: Math.round(ry1 * ".$height.") + 'px',
+						marginLeft: '-' + Math.round((rx1 * coords.x)*2) + 'px',
+						marginTop: '-' + Math.round((ry1 * coords.y)*2) + 'px'
+					});
+			
+		
+		";
+	}else{
+		$jc.="
+			jQuery('#preview1').css({
+						width: Math.round(rx1 * ".$width.") + 'px',
+						height: Math.round(ry1 * ".$height.") + 'px',
+						marginLeft: '-' + Math.round(rx1 * coords.x) + 'px',
+						marginTop: '-' + Math.round(ry1 * coords.y) + 'px'
+					});
+				
+				
+		";
+	}
+
+$jc.="				
+				}
+			}";
+    
+    
+    
+    
+    
+    
+    
+    $scripts="<script type='text/javascript' src='/js/jcrop/jquery.Jcrop.min.js'></script><link rel='stylesheet' href='/js/jcrop/jquery.Jcrop.css' type='text/css'/>";
+    $scripts.="<script type='text/javascript'>".$jc."</script>";
+    
+    
+        $rets = array($newname,$cs[0],$cs[1],$rettable,$scripts);
+    return($rets);
+    } 
+    
+    
+    
+    
+    function add_to_table($table="",$fields="",$debug=""){
+        
+        $sql = "INSERT INTO `".$table."` SET ".$fields;
+        //
+        if($debug==""){
+        $res = mysql_query($sql,ML);
+         return(mysql_insert_id());
+        }else{
+            echo $sql;
+        }
+   
+    }
+    
+    function striptoname($file){
+        $b = explode("/",$file);
+        $imN = $b[count($b)-1];
+        $rn = explode(".",$imN);
+        return($rn[0]);
+    }
+    
+    function updateTable($table="",$fields="",$debug=""){
+        $sql = "UPDATE `".$table."` SET ".$fields." LIMIT 1";
+        //echo $sql;
+        if($debug==""){
+        $res = mysql_query($sql,ML);
+        }else{
+            echo $sql;
+        }
+    }
+    
+    
+    
+    
+}
+
+?>

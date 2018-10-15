@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Image Galery</title>
+	<link href="css/igallery.css" type="text/css" rel="stylesheet" />
+	<script src="../../css/core.js" type="text/javascript"></script>
+	<script src="js/igallery.js" type="text/javascript"></script>
+</head>
+<body>
+<script  type="text/javascript">
+addEvent(window, 'load', function() {
+		var
+			imgLib = window.opener.imgLib,
+			files = imgLib.getDirContent().files,
+			path = imgLib.getDirContent().path,
+			path = '/' + ((path.length > 0) ? path.join('/') + '/' : ''),
+			uploadPath = imgLib.getConfig('uploadPath'),
+			thmbPath = imgLib.getConfig('thmbPath') || imgLib.getConfig('uploadPath'),
+			thmbDir = imgLib.getConfig('thmbDir'),
+			i,
+			elements = []
+		;
+
+	if (files.length > 0) {
+		for (i = files.length; i-- > 0 ;) {
+			elements.push({
+				th: getURIEncPath(HTMLDecode(thmbPath + path + thmbDir + '/' + files[i].thmb)),
+				src: getURIEncPath(HTMLDecode(uploadPath + path + files[i].name))
+			});
+		}
+		elements.reverse();
+
+		iGallery.init({
+			autoShow: true,
+			autoPlay: true,
+			enlargeSmallImages: false,
+			showItemInfo: true,
+			loopPlay: true,
+			elements: elements,
+			slideshowDelay: 7,
+			onExit: function() {window.close();}
+		});
+	} else {
+		alert('No files!');
+		window.close();
+	}
+});
+</script>
+</body>
+</html>

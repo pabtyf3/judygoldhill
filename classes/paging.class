@@ -1,0 +1,114 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+
+class paging{
+    
+    var $curpage="";
+    var $per_page="";
+    var $maxpage="";
+    var $output="";
+    var $offset="";
+    var $table="";
+    var $filters="";
+    var $pre_url = "";
+    var $pretype="";
+    
+    
+    function __construct($curpage="",$per_page="",$table="",$filter="",$pretype=""){
+        $this->table = $table;
+        $this->curpage = $curpage;
+        $this->filter = $filter;
+        $this->per_page=$per_page;
+        $this->pretype=$pretype;
+        $this->get_preurl();
+        $this->populate();
+    }
+    
+    
+    function populate(){
+        
+        $nume = $this->max_pages();
+        if($nume>1){
+        $ret = "<div id='paging_div' style='clear:both;'><table><tr>";
+        
+        if($this->curpage==0){
+            $prev = $nume-1;
+            $ret.="<td><a href='".$this->pre_url."".$prev."/' class='pag-prev'></a></td>";
+        }else{
+            $prev = $this->curpage-1;
+            $ret.="<td><a href='".$this->pre_url."".$prev."/' class='pag-prev'></a></td>";  
+        }
+        
+        $curp = $this->curpage+1;
+        
+        $ret.="<td><span class=''>Page ";
+        //.$curp." / ".$nume.
+        for($i=1;$i<$nume+1;$i++){
+            //$p =
+            if($i==1){
+                $li="";
+            }else{
+                $li=$i-1;
+                $li=$li."/";
+            } 
+            $ret.="<a style='padding:0 3px;'";
+            $ret.=$curp==$i?" class='active'":"";
+            $ret.="  href='".$this->pre_url."".$li."'>".$i."</a>";
+            
+        }
+        
+        $ret.="</span></td>";
+        $next = $this->curpage+1;
+        if($next!=$nume){
+        $ret.="<td><a href='".$this->pre_url."".$next."/' class='pag-next'></a></td></tr>";
+        }else{
+            //$next=;
+          $ret.="<td><a href='".$this->pre_url."' class='pag-next'></a></td></tr>";
+           
+        }
+        $ret.="</table></div>";
+        $this->output=$ret;
+        }
+        
+        
+    }
+    
+    
+    
+    function max_pages(){
+        $sql = "SELECT * FROM `".$this->table."` ".$this->filter;
+       // echo $sql;
+        $res = mysql_query($sql);
+        $nume = mysql_num_rows($res);
+        
+        $this->maxpage = ceil($nume/$this->per_page);
+        
+        return($this->maxpage);
+        
+    }
+    
+    function get_preurl(){
+        if(strpos($this->filters,"WHERE")){
+            if(strpos($this->filters,"archive")){
+                $this->pre_url=$this->pretype."archive/";
+                
+            }
+            if (preg_match('/WHERE YEAR\(date\) = \'([0-9]*)\'/', $this->filters, $regs)) {
+	$result = $regs[1];
+    $this->pre_url = $this->pretype."year/".$result."/";
+} 
+
+
+        }else {
+	$this->pre_url = $this->pretype;
+}
+    }
+    
+    
+}
+
+?>

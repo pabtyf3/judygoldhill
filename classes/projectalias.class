@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @author dotnet works
+ * @copyright 2013
+ */
+
+
+ class projectalias{
+
+
+
+var $id='';
+var $projectid='';
+var $alias='';
+
+
+
+function __construct($id=""){
+
+if($id!=""){
+        $this->id = $id;
+        $this->populate();
+        }
+        }
+
+function populate(){
+        $sql = "SELECT * FROM `projectalias` WHERE `id`='".$this->id."' LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res) <1){
+            
+            }else{
+                $row = mysql_fetch_assoc($res);
+                foreach($row as $k=>$v){
+                    $this->$k=$v;
+                    }
+                }
+        }
+
+
+
+
+}
+    
+
+
+
+?>

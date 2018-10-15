@@ -1,0 +1,117 @@
+/*
+			Load CSS before JavaScript
+		*/
+		
+		/*
+			Slides container
+			Important:
+			Set the width of your slides container
+			Set to display none, prevents content flash
+		*/
+		.slides_container {
+			width:1080px;
+			display:none;
+		}
+
+		/*
+			Each slide
+			Important:
+			Set the width of your slides
+			If height not specified height will be set by the slide content
+			Set to display block
+		*/
+		.slides_container div {
+			width:1080px;
+			height:600px;
+			padding: 0px 0px 10px 0px;
+			display:block;
+		}
+		
+		/*
+			Optional:
+			Reset list default style
+		*/
+		.pagination {
+			position:relative;
+			top:-5px;
+			left:650px;
+			list-style:none;
+			display: inline;
+			margin: 10px 0px 0px 0px;
+			padding: 10px 0px 0px 0px;
+		}
+		.pagination ul{
+			
+			padding: 10px 0px 0px 0px;
+		}
+		.pagination li{
+			display: inline;
+			padding: 10px 12px 0px 0px;
+		}
+
+		/*
+			Optional:
+			Show the current slide in the pagination
+		*/
+		.pagination .current a {
+			color:#808080;
+			text-decoration:underline;
+		}
+		.prev{
+		position:relative;
+		top:10px;
+		left:0px;
+		padding: 0px 0px 0px 0px;
+		margin: 0px 10px 0px 0px;
+		z-index:22;
+		background-image:url("/images/arrow_left.gif");
+		background-position:top;
+		background-repeat : no-repeat;
+		display:block;
+		width:10px;
+		height:10px;
+		}
+		.next{
+		position:relative;
+		padding: 0px 0px 0px 0px;
+		top:0px;
+		left:67px;
+		z-index:22;
+		background-image:url("/images/arrow_right.gif");
+		background-position:top;
+		background-repeat : no-repeat;
+		display:block;
+		width:10px;
+		height:10px;
+		/*left:200px;*/
+		}
+		.slide_count{
+		position:relative;
+		top:-13px;
+		left:0px;
+		z-index:20;
+		padding: 0px 0px 0px 0px;
+		margin: 0px 10px 0px 25px;
+		/*text-align:right;*/
+		/*font-size:81%;*/
+		}
+		.current{
+		text-align:right;
+		color: #da291c;
+		}
+		.total{
+		text-align:center;
+		color: #da291c;
+		}
+		
+		.fullscreen{
+		position:relative;
+		z-index:21;
+		left:111px;
+		top:-30px;
+		padding:0px 0px 0px 0px;
+		margin:0px 0px 0px 0px;
+		width:16px;
+		height:13px;
+		/*border : solid Black; border-width : 1px;*/
+		}

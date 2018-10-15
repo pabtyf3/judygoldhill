@@ -1,0 +1,41 @@
+/********************************************************************
+ * imgLib v0.1.2 09.04.2011
+ * Contact me at dev@jstoys.org.ua
+ * Site: http://jstoys.org.ua/
+ * This copyright notice MUST stay intact for use.
+ *
+ * This library gives you the possibility to upload, browse, manipulate and select
+ * images on your webserver.
+ *
+ * Requirements:
+ * - PHP 4.1.x or later
+ ********************************************************************/
+
+Version 0.1.2 r53
+	14.08.2010 - __.__.2011
+		+	HTML5 file uploader
+		+	Request caching functionality
+		+	File thumbnail select
+		+	Multiply configuration in one file
+		+	Simplify configuration file. Typically one 1 parameter must be set - path to upload folder.
+		+	Navigation by using history change. (Not for IE < 8)
+		+	More flexible and powerful configuration: save state, sorting options, set thumbnail file save folder, etc...
+		+	Unicode support improved
+		+	Custom context menu improvement (demonstration include - slideshow)
+		+	Visual improvement
+		+	Code rewriting
+		+	Bug fixing
+		+	and lots more....
+
+
+	22.11.2009 - 03.02.2010
+		Add the functionality to set the start dir to browsing
+		Add the german translation by Martin.
+		Add support to absolute url to image, like "http://some.host/path/to/upload/dir/"
+		Image Tools support enable if add new argument "imgtools_config=1" to config call.
+		Add support for the Microsoft Windows.
+		New public method imglib.gotoPath() - browse the selected path.
+		Change the license to MIT/BSD.
+		Updating the structure of config file.
+		Change the file extension set in config file to "|" delimiter.
+		Add France translation by Hubert Garrido

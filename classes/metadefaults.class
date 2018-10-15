@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @author dotnet works
+ * @copyright 2012
+ */
+
+class metadefaults{
+    var $metatitle="";
+    var $metadesc="";
+    var $metakey="";
+    
+    function __construct(){
+           $this->metatitle="Judy Goldhill";
+    $this->metadesc="Judy Goldhill, Photographer";
+    $this->metakey="Judy Goldhill, Professional Photographer";
+     
+    }
+}
+
+?>

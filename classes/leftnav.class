@@ -1,0 +1,147 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+ 
+ 
+ class leftnav{
+    var $cpage = ""; #current page
+    var $output = "";
+    
+    
+    function __construct($cpage=""){
+        if($cpage!=""){
+            $this->cpage = $cpage;
+           
+        }
+         $this->populate();
+    }
+    
+    
+    
+    
+    function populate(){
+        $ret = $this->common();
+        if($this->cpage==1){
+            $ret.=$this->newsSumm();
+        }
+        if(in_array($this->cpage,array("2","3","4"))){
+            //echo $this->cpage;
+            $ret.=$this->about_sub();
+        }
+        $this->output = $ret;
+    }
+    
+    function common(){
+        //echo $this->curpage;
+        $ret="<div id='leftnavarea1'>
+<ul class='leftnavlist1'>";
+$ret.=$this->cpage==1?"<li class='active'>Home</li>":"<li><a href='/'>Home</a></li>";
+$ret.=strpos($_SERVER['REQUEST_URI'],"news/")?"<li class='active'><a href='/news/'>News</a></li>":"<li><a href='/news/'>News</a></li>";
+$ret.=strpos($_SERVER['REQUEST_URI'],"work/")?"<li class='active'><a href='/work/' id='work_nav'>Work</a></li>":"<li><a href='/work/' id='work_nav'>Work</a></li>";
+$ret.=strpos($_SERVER['REQUEST_URI'],"exhibitions")?"<li class='active'><a href='/exhibitions/'>Exhibitions</a></li>":"<li><a href='/exhibitions/'>Exhibitions</a></li>";
+$ret.=in_array($this->cpage,array(2,3,4))?"<li class='active'>About</li>":"<li><a href='/about_biog/'>About</a></li>";
+$ret.=$this->cpage==5?"<li class='active'>Contact</li>":"<li><a href='/contact/'>Contact</a></li>";
+$ret.="
+
+</ul>
+</div>";
+return($ret);
+    }
+    
+    
+    function about_sub(){
+        $ret='<div id="leftnavarea2">
+
+';
+$ret.=$this->cpage==2?'Biography<br />':'<a href="/about_biog/">Biography</a><br />';
+$ret.=$this->cpage==3?'CV<br />':'<a href="/about_cv/">CV</a><br />';
+$ret.=$this->cpage==4?'Imprint':'<a href="/about_imprint/">Imprint</a>';
+
+$ret.='<!-- end left nav 2-->
+</div>';
+if($this->cpage=="3"){
+$ret.='<div class="navdivider"></div>
+
+<!-- left nav 3 - related -->
+<div id="leftnavareaRelated">
+
+<!--ul class="leftnavlist1">
+<li><a href="cv.pdf.html">Download CV</a></li>
+</ul-->
+
+</div>';
+
+}
+return($ret);
+
+    }
+    
+    
+    function newsSumm(){
+        //echo "Hello";
+        $news = new news();
+        $firstnews = $news->hp_summary();
+        if($firstnews!=""){
+$nali = new alias();
+$alias = $nali->makeAlias_nocheck($firstnews['title']);
+        $ret.='
+<!-- left nav 2-->	
+
+<div id="leftnavarea2">
+<span class="red">News</span><br />
+
+<div id="index_news_item">';
+$ret.=$firstnews['shortdesc'];
+
+$ret.='</div><br />
+<a href="/news/'.$firstnews['date'].'/'.$firstnews['id'].'/'.$alias.'/'.'">Read More...</a>
+
+<!-- end left nav 2-->
+</div>';
+}else{
+    $ret="";
+}
+$hpsharelinks = '<div id="leftnavareaIcons">
+<a class="iconTwitter" target="_blank" href="http://twitter.com/goldyjudy"><span class="displaynone">Twitter</span></a>
+<a class="iconVimeo" target="_blank" href="http://vimeo.com/user16185021"><span class="displaynone">Vimeo</span></a>
+<a class="iconLinkedin" target="_blank" href="http://www.linkedin.com/pub/judy-goldhill/9/5ab/593"><span class="displaynone">LinkedIn</span></a>
+</div>';
+
+
+return($ret.$hpsharelinks);
+    }
+    
+    
+    
+    function adminMenu(){
+              $ret="<div id='leftnavarea1'>
+<ul class='leftnavlist1'>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=project'>Work</a></li>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=projectcategories'>Work Categories</a></li>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=news'>News</a></li>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=exhibition'>Exhibitions</a></li>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=slide'>Homepage Slides</a></li>";
+    $ret.="<li><a href='/jg-admin/admin.php?class=page'>Page Admin</a></li>";
+    $ret.="<li><br /></li>";
+    $ret.="<li><a href='/jg-admin/actions/logout.php'>Log Out</a></li>";
+
+$ret.="
+
+</ul>
+</div>";
+return($ret);
+    }
+
+    
+    function work_home(){
+        $pr = new project();
+        $pr->forLeftnav();
+    }
+    
+    
+ }
+
+?>

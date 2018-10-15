@@ -1,0 +1,355 @@
+<?php
+
+/**
+ * @author pabtyf
+ * @copyright 2012
+ */
+
+class projectimage{
+    
+    var $id="";
+    var $projectid="";
+    var $file="";
+    var $alt="";
+    var $title="";
+    var $media="";
+    var $size="";
+    var $order="";
+    var $catid="";
+    var $thumbwidth="";
+    
+    function __construct($id=""){
+        if($id!=""){
+            $this->id=$id;
+            $this->populate();
+        }
+    }
+    
+    
+    function populate(){
+        $sql="SELECT * FROM `projectimage` WHERE `id`='".$this->id."' LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $row=mysql_fetch_assoc($res);
+            foreach($row as $k=>$v){
+                $this->$k=$v;
+            }
+        }
+        
+    }
+    
+    
+    
+    function getByProject($id=""){
+        $sql ="SELECT * FROM `projectimage` WHERE `project_id`='".$id."' ORDER BY `order`";
+        $res = mysql_query($sql);
+        $ims=array();
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $ims = array();
+            while($row = mysql_fetch_assoc($res)){
+                $ims[]=$row;
+            }
+        }
+        return($ims);
+    }
+    
+    function add($file="",$project=""){
+        //$pro = new project($project);
+        
+        $sql = "INSERT INTO `projectimage` SET `file`='".$file."',`project_id`='".$project."'";
+      $handle=  fopen($_SERVER['DOCUMENT_ROOT']."/debug.txt","a");
+        fwrite($handle,$sql."<br/>");
+        fclose($handle);
+        mysql_query($sql);
+        
+    }
+    
+    
+    function detailsEdit($projectid=""){
+        $project = new project($projectid);
+        $ret="<h1>".$project->name."</h1><br /><br />";
+        $ret.="<a class='falsebutton' href='projectimageupload.php?id=".$projectid."'>Add images for project</a><br /><br />";
+        //$ret.="<p>On this page you can edit image information,";
+        if($projectid!=""){
+            $sql ="SELECT * FROM `projectimage` WHERE `projectid`='".$projectid."' ORDER BY `order` ASC";
+           // echo $sql;
+            $res = mysql_query($sql);
+            if(mysql_num_rows($res)<1){
+                $ret.="<script type='text/javascript'>
+                    $(function(){
+                       
+                        $('#back').click(function(){
+                           window.location='admin.php?c=project'; 
+                        });
+                    });
+                
+                </script><div style='clear:both;'><input type='button' id='back' value='Back'/></div>";
+            }else{
+                $ret.="<script type='text/javascript'>
+                    $(function(){
+                        $('#saver').hide();
+                        $('.orderField').keyup(function(){
+                            
+                            if(!$('#saver').hasClass('visible')){
+                                $('#saver').show().addClass('visible');
+                                $('#back').hide();
+                                }
+                                
+                                
+                        });
+                        $('#back').click(function(){
+                           window.location='admin.php?c=project'; 
+                        });
+                    });
+                
+                </script>";
+                $ret.="<form action='order.php' method='post' style='clear:both;'><fieldset>
+                <input type='hidden' name='class' value='projectimage' />
+                <input type='submit' name='sO' id='saver' value='Save' /><input type='button' id='back' value='Back'/>";
+                $ret.="<table style='width:750px;' class='vandm'><tr><th>Image</th><th>Title</th><th>Order</th><th>Edit Details</th></tr>";
+                while($row = mysql_fetch_assoc($res)){
+                    $tim = new projectimage($row['id']);
+                    $ret.="<tr><td><img src='/images/projects/thumbs/".$tim->file."' alt='".$tim->alt."' style='width:80px;' /></td>";
+                    $ret.="<td>".$tim->title."</td>";
+                    $ret.="<td><input type='text' style='width:3em;' class='orderField' name='order".$tim->id."' value='".$tim->order."' /></td>";
+                    $ret.="<td style='text-align:center;'><a href='edit.php?c=projectimage&id=".$tim->id."' title='Edit Image Details'><img src='/images/icons/pencil.png' alt='Edit Image Details' /></a>";
+                     $ret.=" | <a href='delete.php?c=projectimage&id=".$tim->id."' title='Delete this Image'><img src='/images/icons/bin_closed.png' /></a></td>";
+         
+                    $ret.="</tr>";
+                    
+                }
+                $ret.="</table></fieldset></form>";
+            }
+        }
+        return($ret);
+    }
+    
+    
+    function form($action="add"){
+            $ret="<form action='formProcess.php' method='post'><fieldset>";
+        $ret.="<input type='hidden' name='id' value='".$this->id."' />";
+        $ret.="<input type='hidden' name='action' value='".$action."'/>";
+        $ret.="<input type='hidden' name='class' value='projectimage' / >";
+          $ret.="<input type='hidden' name='ret' value='".$_SERVER['HTTP_REFERER']."'/>";
+          $ret.="<table>";
+          $ret.="<tr><td>Title: </td><td><input type='text' name='title' id='title' value='".$this->title."' class='the300' /></td></tr>";
+          $ret.="<tr><td>Media: </td><td><input type='text' name='media' value='".$this->media."' class='the300' /></td></tr>";
+          $ret.="<tr><td>Size: </td><td><input type='text' name='size' value='".$this->size."' class='the300' /></td></tr>";
+          $ret.="<tr><td>Alt text: </td><td><input type='text' name='alt' id='alt' value='".$this->alt."' class='the300' /></td></tr>";
+          $ret.="<tr><td colspan='2'><input type='submit' name='sC' value='Save Changes' /></td></tr>";
+          $ret.="</table></fieldset></form>";
+          
+          return($ret);
+    }
+    
+    
+    function processForm(){
+        if(isset($_POST['sC'])){
+            $sql ="UPDATE `projectimage` SET `alt`='".mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['alt'], 'HTML-ENTITIES')))."',
+            `media` = '".mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['media'], 'HTML-ENTITIES')))."',
+            `size` = '".mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['size'], 'HTML-ENTITIES')))."',
+            `title`='".mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['title'], 'HTML-ENTITIES')))."'
+            WHERE `id`='".$_POST['id']."'";
+            mysql_query($sql);
+            
+            
+        }
+    }
+    
+   
+   function order(){
+    //$sql = "UPDATE `projectimage` SET `order`="
+        foreach($_POST as $k=>$v){
+            if(strpos($k,"rder")){
+                //$id;
+                $id=str_replace("order","",$k);
+                $sql = "UPDATE `projectimage` SET `order`='".$v."' WHERE `id`='".$id."'";
+                mysql_query($sql);
+            }
+        }
+   }
+    
+    
+    
+    function getWidths(){
+        $sql ="SELECT * FROM `projectimage` WHERE `thumbwidth`=0";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            while($row = mysql_fetch_assoc($res)){
+                list($width, $height, $type, $attr) = getimagesize($_SERVER['DOCUMENT_ROOT']."/images/projects/thumbs/".$row['file']);
+                $sql2= "UPDATE `projectimage` SET `thumbwidth`='".$width."' WHERE `id`='".$row['id']."'";
+                mysql_query($sql2);
+            }
+        }
+    }
+    
+    function admin(){
+        $this->sizepop();
+        $sql = "SELECT * FROM `projectimage` WHERE `project_id`='".$_GET['project_id']."'";
+       // echo $sql;
+        $res = mysql_query($sql);
+        $ret="<a href='/jg-admin/actions/add_projectimages.php?project_id=".$_GET['project_id']."' class='falsebutton'><img src='/css/icons/add.png' alt='Add a new Images' />Add Images</a>";
+       
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $ret.="<script type='text/javascript'>
+            $(function(){
+                $('input:radio').change(function(){
+                    //alert($(this).val());
+                   window.location = '/jg-admin/actions/thumb_update.php?class=projectimage&id='+$(this).val(); 
+                });
+                });
+            </script>";
+            $ret.="<form action='/jg-admin/actions/projectimage_update.php' method='post'><fieldset>";
+                  $ret.="<table style='width:750px;'>
+                  <tr><td></td><td></td><td></td><td></td><td><input type='submit' name='sC' value='Save Changes' /></td></tr>
+            <tr><th>Image</th><th>Title</th><th>Order</th><th>Thumbnail</th><th>Actions</th></tr>";
+            $x=0;  
+        while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tNews = new projectimage($row['id']);
+            $ptitle = $tNews->name;
+            $ret.="<tr".$c."><td style='text-align:center; padding:2px;'><img src='/images/projects/thumbs/".$tNews->file."' height='80px' alt='".$tNews->title."' /></td>
+            <td style='vertical-align:middle; text-align:center;'><textarea rows='2' cols='25' name='title".$tNews->id."'>".$tNews->title."</textarea></td>
+            <td style='vertical-align:middle; text-align:center;'><input type='text' name='order".$tNews->id."' style='width:3em;' value='".$tNews->order."' /></td>
+            <td style='text-align:center; vertical-align:middle;'>
+            <input type='radio' name='thumbnail' value='".$tNews->id."'";
+            $ret .= $tNews->is_thumbnail==1?" checked='checked'":"";
+            $ret.=" />
+            </td><td style='text-align:center; vertical-align:middle;'>
+            <a href='/jg-admin/actions/delete.php?class=projectimage&id=".$tNews->id."'><img src='/css/icons/bin_closed.png' title='Delete Video' alt='Delete Video'/></a>
+            </td></tr>";
+            $x++;
+            } 
+            $ret.="</table></fieldset></form>"; 
+        }
+        return($ret);
+    }
+    
+    function uploadify(){
+        $ret = "  <script type='text/javascript' src='/js/uploadify2/jquery.uploadify-3.1.min.js'></script>
+	<title>Admin </title>
+       <script type='text/javascript'>
+$(document).ready(function() {
+    var upload1Done=0;
+    var upload2Done=0;
+    
+  $('#file_upload').uploadify({
+    'swf'  : '/js/uploadify2/uploadify.swf',
+    'uploader'    : '/js/uploadify2/uploadify.php',
+    
+    'auto'      : false,
+    'multi'     : true,
+    'onUploadSuccess' : function(file,data,response) {
+     // alert(data.filesUploaded + ' files uploaded successfully!');
+      //upload1Done=1;
+      return(true);
+     
+    },
+    'formData' :{'project_id':'".$_GET['project_id']."'}
+  });
+
+  $('#upload_queue2').click(function(){
+   $('#file_upload').uploadify('upload','*');
+    //$('#file_upload2').uploadifyUpload();
+  
+    $('#nextStep').attr('disabled',false);
+    
+    
+   
+     //
+  })
+  $('#nextStep').click(function(){
+    window.location = '/jg-admin/admin.php?class=projectimage&project_id=".$_GET['project_id']."';
+  });
+});
+
+    </script>
+    <link rel='stylesheet' type='text/css' href='/js/uploadify2/uploadify.css' />";
+    
+    $ret.='       <h1>Select images to upload</h1><br /><br /><div id="file_upload">
+
+</div><span style="display: block; height:20px;"></span>
+<input type="button" id="upload_queue2" value="Upload Selected Files"/>
+<br /><br />
+<input type="button" id="nextStep" value="Continue.." disabled="disabled" /> 
+  ';
+  return($ret);
+    
+    }
+    
+   
+   
+     function updateThumb(){
+        $sql = "UPDATE `projectimage` SET `is_thumbnail`='0' WHERE `project_id`='".$this->project_id."'";
+        //echo $sql;
+        mysql_query($sql);
+        $sql2 = "UPDATE `projectimage` SET `is_thumbnail`='1' WHERE `id`='".$this->id."' LIMIT 1";
+        mysql_query($sql2);
+    }
+    
+    function updateImages(){
+        foreach($_POST as $k=>$v){
+            if(strpos($k,"rder")){
+                $id = str_replace("order","",$k);
+                $sql ="UPDATE `projectimage` SET `order`='".$v."' WHERE `id`='".$id."'";
+                mysql_query($sql);
+            }elseif(strpos($k,"itle")){
+                $id = str_replace("title","",$k);
+                $sql ="UPDATE `projectimage` SET `title`='".$v."' WHERE `id`='".$id."'";
+                mysql_query($sql); 
+            }
+        }
+        
+    }
+    
+    function sizepop(){
+        $sql = "SELECT * FROM `projectimage` WHERE `width`='0' OR `height`='0'";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            while($row = mysql_fetch_assoc($res)){
+                list($width, $height, $type, $attr) = getimagesize($_SERVER['DOCUMENT_ROOT']."/images/projects/".$row['file']);
+                $sql2="UPDATE `projectimage` SET `width`='".$width."',`height`='".$height."' WHERE `id`='".$row['id']."'";
+                mysql_query($sql2);
+            }
+        }
+    }
+    
+    function getMyThumb($project_id=""){
+        if($project_id!=""){
+            $sql = "SELECT * FROM `projectimage` WHERE `project_id`='".$project_id."' AND `is_thumbnail`='1'";
+            $res = mysql_query($sql);
+            if(mysql_num_rows($res)<1){
+                $sql = "SELECT * FROM `projectimage` WHERE `project_id`='".$project_id."' ORDER BY `order` ASC LIMIT 1";
+                $res = mysql_query($sql);
+                if(mysql_num_rows($res)<1){
+                    return("");
+                }else{
+                    $row = mysql_fetch_assoc($res);
+                    return("/images/projects/thumbs/".$row['file']);
+                }
+            }else{
+                $row = mysql_fetch_assoc($res);
+                return("/images/projects/thumbs/".$row['file']);
+            }
+        }
+    }
+    
+             function delete(){
+            if($this->id!=""){
+                $sql = "DELETE FROM `projectimage` WHERE `id`='".$this->id."'";
+                mysql_query($sql);
+            }
+        }
+}
+
+?>

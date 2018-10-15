@@ -1,0 +1,193 @@
+<?php
+
+/**
+ * @author dotnet works
+ * @copyright 2013
+ */
+
+
+ class page{
+
+
+
+var $id='';
+//var $title='';
+var $content='';
+var $metatitle='';
+var $metadesc='';
+var $metakey='';
+
+
+
+function __construct($id=""){
+
+if($id!=""){
+        $this->id = $id;
+        $this->populate();
+        }
+        }
+
+function populate(){
+        $sql = "SELECT * FROM `page` WHERE `id`='".$this->id."' LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res) <1){
+            
+            }else{
+                $row = mysql_fetch_assoc($res);
+                foreach($row as $k=>$v){
+                    $this->$k=$v;
+                    }
+                }
+        }
+
+
+ function form($action='add'){
+        if($action=="add"){
+        $ret = "<h2>Add a new page</h2>";
+        }else{
+            $ret = "<h2>Edit Page:- ".$this->title."</h2>";
+        }
+        $tiny = new tinymce("content","simple_adv");
+        $ret.=$tiny->script;
+        $ret.="<form action='/jg-admin/actions/formProcess.php' method='post'><fieldset>";
+            $ret .= "<input type='hidden' name='class' value='page' />
+        <input type='hidden' name='ret' value='/jg-admin/admin.php?class=page' />";
+        $ret.= $this->id!=""?"<input type='hidden' name='id' value='".$this->id."' />":"";
+      
+        $ret.="<input type='hidden' name='action' value='".$action."'/>";
+        $ret.="<table>";
+        $ret.="<tr><td><label for='title'>Page Title: </label></td><td><input type='text' class='the300' name='title' id='title' value='".html_entity_decode($this->title)."' /></td></tr>";
+      
+        $ret.="<tr><td style='vertical-align:top;'><label for='content'>Content :</label></td><td></td></tr>";
+        $ret.="<tr><td colspan='2'><textarea name='content' rows='20' cols='50' style='width:300px;'>".$this->content."</textarea></td></tr>";
+      $ret.="<tr><th colspan='2'>Meta Data:</th></tr>";
+        $ret.="<tr><td><label for='metatitle'>Meta Title :</label></td><td><input class='the300' type='text' name='metatitle' id='metatitle' value='".$this->metatitle."' /></td></tr>";
+        $ret.="<tr><td style='vertical-align:top;'><label for='metadesc'>Meta Description :</label></td><td>
+        <textarea name='metadesc' id='metadesc' rows='10' cols='30'>".$this->metadesc."</textarea></td></tr>";
+         $ret.="<tr><td style='vertical-align:top;'><label for='metakey'>Meta Keywords :</label></td><td>
+        <textarea name='metakey' id='metakey' rows='10' cols='30'>".$this->metakey."</textarea></td></tr>";
+        $ret.="<tr><td colspan='2'><input type='submit' name='sC' value='Save Page' /></td></tr>";
+        $ret.="</table></fieldset></form>";
+        return($ret);
+        
+    }
+    
+      function processForm(){
+        $aliasString = "";
+        if(isset($_POST['sC'])){
+    
+            
+            $this->content = mysql_real_escape_string(stripslashes($_POST['content']));
+         $this->title = mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['title'], 'HTML-ENTITIES')));
+             $this->metadesc = mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['metadesc'], 'HTML-ENTITIES')));
+             $this->metatitle = mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['metatitle'], 'HTML-ENTITIES')));
+             $this->metakey = mysql_real_escape_string(stripslashes(mb_convert_encoding($_POST['metakey'], 'HTML-ENTITIES')));
+            
+            
+         if($_POST['action']=="add"){
+            $sql = "INSERT INTO `page` SET 
+            
+           `title`='".$this->title."',
+            `content`='".$this->content."',
+           
+           
+            `metadesc`='".$this->metadesc."',
+            `metatitle`='".$this->metatitle."',
+            `metakey`='".$this->metakey."'";
+           // echo $sql;
+            $res = mysql_query($sql);
+          
+         }else{
+              $sql = "UPDATE `page` SET 
+            
+           
+            `content`='".$this->content."',
+           `title`='".$this->title."',
+            
+            `metadesc`='".$this->metadesc."',
+            `metatitle`='".$this->metatitle."',
+            `metakey`='".$this->metakey."' WHERE `id`='".$this->id."'";
+            $res = mysql_query($sql);
+            //echo $sql;
+          
+            
+            
+         }    
+        }
+    }
+    
+        function admin(){
+        $sql = "SELECT * FROM `page` ORDER BY `title` ASC";
+        $res = mysql_query($sql);
+        $ret="<a href='/jg-admin/actions/add.php?class=page' class='falsebutton'><img src='/css/icons/add.png' alt='Add a new page' />Add Page</a>";
+        $ret.="<table style='width:750px;'>
+            <tr><th>Page Title</th><th>Actions</th></tr>";
+            $x=0;  
+        while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tpage = new page($row['id']);
+            $ptitle = $tpage->title;
+                
+            
+            $ret.="<tr".$c."><td style='text-align:center;'>".$ptitle."</td><td style='text-align:center;'>";
+      $ret.=" <a href='/jg-admin/actions/edit.php?class=page&id=".$tpage->id."'><img src='/css/icons/pencil.png' alt='Edit Page' /></a>";
+                $ret.="</td></tr>";
+            
+            
+            $x++;
+        }
+        $ret.="</table>";
+    
+        return($ret);
+    }
+    
+    
+    
+    function checkmeta(){
+        if($this->metatitle==""||$this->metadesc==""||$this->metakey==""){
+             $metadef = new metadefaults();
+             $this->metatitle = $this->metatitle==""?$metadef->metatitle:$this->metatitle;
+             $this->metadesc = $this->metadesc==""?$metadef->metadesc:$this->metadesc;
+             $this->metakey = $this->metakey==""?$metadef->metakey:$this->metakey;
+             
+        }
+    }
+    
+    function meta(){
+        $this->checkmeta();
+        $ret = "<title>".$this->metatitle."</title>";
+        $ret.='<meta name="description" content="'.$this->metadesc.'" />
+<meta name="keywords" content="'.$this->metakey.'" />';
+return($ret);
+    }
+    
+    function to_content(){
+        
+        if($this->id==1){
+            $s = new slide();
+            $slides =$s->newSlideshow();
+           $ret.= $this->content = $slides; 
+            }else{
+        $ret="";
+        $cd=0;
+        if(in_array($this->id,array(2,3,4,5))){
+            $cd = 1;
+            $ret.="<div id='article'>";
+        }
+        
+        $ret.=in_array($this->id,array(3,5,6))?"":"<strong>".$this->title."</strong><br /><br />";
+        $ret.=$this->content;
+        $ret.=$cd==1?"</div>":"";
+        }
+        
+        
+        return($ret);
+    }
+    
+
+}
+    
+
+
+
+?>

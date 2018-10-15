@@ -1,0 +1,178 @@
+<?php
+/********************************************************************
+ * imgLib v0.1.2 09.04.2011
+ * Contact me at dev@jstoys.org.ua
+ * Site: http://jstoys.org.ua/
+ * This copyright notice MUST stay intact for use.
+ *
+ * This library gives you the possibility to upload, browse, manipulate and select
+ * images on your webserver.
+ *
+ * Requirements:
+ * - PHP 4.1.x or later
+ ********************************************************************/
+
+$msg = array(
+
+/*HTML Messages*/
+'Insert Image:'=>'Вставити картинку:',
+'Image URL:'=>'URL картинки:',
+'Alternate Text:'=>'Альтерн. текст:',
+'Layout:'=>'Макет:',
+'Width:'=>'Ширина:',
+'Height:'=>'Висота:',
+'Border:'=>'Границя:',
+'Preview:'=>'Попередній перегляд:',
+'File size:'=>'Розмір файла:',
+'File date:'=>'Дата файла:',
+'Alignment:'=>'Вирівнювання:',
+'Not Set'=>'Не задано',
+'Left'=>'Зліва',
+'Right'=>'Справа',
+'Texttop'=>'Верхня границя по висоті рядка',
+'Absmiddle'=>'Absmiddle',
+'Baseline'=>'По базовій лінії',
+'Absbottom'=>'Absbottom',
+'Bottom'=>'По низу',
+'Middle'=>'По середині',
+'Top'=>'По верхній границі',
+'Horizontal Space:'=>'Відступ по гориз.:',
+'Vertical Space:'=>'Відступ по верт.:',
+'imgLib for'=>'imgLib для',
+'Please enable JavaScript to display files.'=>'Увімкніть JavaScript для відображення файлів.',
+'Submit'=>'Надіслати',
+'Cancel'=>'Відмінити',
+
+
+/*JavaScript Messages*/
+'b'=>'б',
+'Kb'=>'Кб',
+'Mb'=>'Мб',
+'Gb'=>'Гб',
+'Tb'=>'Тб',
+'Eb'=>'Еб',
+'Root'=>'Корінь',
+'Loading...'=>'Завантаження...',
+'Up'=>'На один рівень вверх',
+'Remove not empty folder "%1"?'=>'Видалити не порожній каталог "%1"?',
+'Remove "%1"?'=>'Видалити "%1"?',
+'Enter name of new directory:'=>'Введіть назву нового каталогу:',
+'New Folder'=>'Новий каталог',
+'Enter new name of "%1":\n(file extension is add automatic)'=>'Введіть нове ім\\\'я для "%1":\n(розширення файлу буде додано автоматично)',
+'Operation failed. Error code is %1.'=>'Операція не виконана. Код помилки %1.',
+'This script reguire browser that support the AJAX tehnology!'=>'Цей скрипт вимагає переглядача, що підтримує технологію AJAX!',
+'No change!'=>'Нема змін!',
+'Create folder'=>'Створити каталог',
+'Select thumbnail'=>'Вибрати мініатюру',
+'Open'=>'Відкрити',
+'Browse'=>'Переглянути',
+'Copy'=>'Копіювати',
+'Cut'=>'Вирізати',
+'Paste'=>'Вставити',
+'Delete'=>'Видалити',
+'Rename'=>'Перейменувати',
+'Reload curent directory'=>'Оновити поточний каталог',
+'File name'=>'Ім`я файлу',
+'File size'=>'Розмір файлу',
+'File date'=>'Дата зміни',
+'Date'=>'Дата',
+'Size'=>'Розмір',
+'Image size'=>'Розмір зображення',
+'View'=>'Вигляд',
+'Thumbnail'=>'Мініатюри',
+'List'=>'Список',
+'Table'=>'Таблиця',
+'Search'=>'Пошук',
+'Enter part of file name:'=>'Введіть частину назви файла:',
+'Sort'=>'Сортувати',
+'By name'=>'По імені',
+'By size'=>'По розміру',
+'By date'=>'По даті',
+'Upload'=>'Вивантажити файл(и)',
+'Cancel'=>'Відмінити',
+'Directory is write protected!'=>'Каталог захищений від запису!',
+'Add more field'=>'Додати ще поля',
+'Delete field'=>'Видалити поле',
+'Select first file'=>'Виберіть перший файл',
+'Allowed extension: %1.'=>'Дозволені розширення файлів: %1.',
+'Max upload size (total/file): %1/%2.'=>'Максимальний розрмір (всього/файла): %1/%2.',
+'Path: %1'=>'Шлях: %1',
+'Your browser supports multiple selection of files to upload. Try it.'=>'Ваш браузер підтримує множинний вибір файлів для завантаження. Спробуйте це.',
+'Uploaded files: %1. Name(s): %2.'=>'Завантажено файлів: %1. Назва(и): %2.',
+'Automatically close the form after upload is finished.' => 'Автоматично закрити форму після завершення завантаженя.',
+'No file selected!' => 'Не вибрано жодного файла!',
+
+// HTML5 File API
+'Your browser supports easy &quot;drag &amp; drop&quot; files upload. Try it - select file and drag it to browser.' => 'Ваш браузер підтримує просте &quot;drag &amp; drop&quot; завантаження файлів. Спробуйте це - виділіть файли і перетягніть їх у браузер.',
+'Saved as: %1.' => 'Збережено як: %1.',
+'Drop your files here' => 'Киньте Ваші файли сюди',
+'Speed' => 'Швидкість',
+'/s' => '/с',
+'Time left' => 'Залишилось',
+'Time' => 'Час',
+'s' => 'с',
+'Waiting in queue' => 'Очікування у черзі',
+'Canceled' => 'Скасований',
+'Abort' => 'Перервати',
+'Aborted' => 'Перерваний',
+'Try again' => 'Спробувати знову',
+'Error on upload' => 'Помилка при завантаженні',
+'Error on response: ' => 'Помилка у відповіді: ',
+'unknown' => 'невідомий',
+'File type: ' => 'Тип файла: ',
+// Error code description
+'Bad file name.' => 'Погане ім&#39;я файлу.',
+'Folder is not writable.' => 'Каталог не доступний для запису.',
+'Can not get free file name.' => 'Не можу отримати вільне ім&#39;я файлу.',
+'Illegal file type.' => 'Недозволений тип файлу.',
+'File size limit exceeded.' => 'Перевищено ліміт на розмір файлу.',
+'Some error when move upload file.' => 'Помилка переміщення завантаженого файлу.',
+'No free space left.' => 'Немає вільного місця.',
+'Local and remote file sizes do not match.' => 'Розміри локального і завантаженого файлу не збігаються.',
+
+
+'Edit'=>'Редактувати',
+'Select'=>'Вибрати',
+'Selected file'=>'Вибраний файл',
+'No return callback'=>'Нема функції зворотнього виклику',
+
+/*JavaScript Image Tools*/
+'Error loading data!'=>'Помилка завантаження даних!',
+'Crop image. Please wait.'=>'Обрізую зображення. Зачекайте.',
+'Resize image. Please wait.'=>'Змінюю розмір зображення. Зачекайте.',
+'Rotate/Flip image. Please wait.'=>'Повертаю/Перевертаю зображення. Зачекайте.',
+'Loading preview....'=>'Завантажую попередній вигляд зображеня...',
+'Error: '=>'Помилка: ',
+'Loading....'=>'Завантаження....',
+
+
+'Resize image'=>'Зміна розміру',
+'Crop image'=>'Обрізка',
+'Rotate/Flip image'=>'Пововрот/Перевернути',
+'Close'=>'Закрити',
+'Size'=>'Розмір',
+'Apply'=>'Застосувати',
+'Save changes'=>'Зберегти зміни',
+'Reset'=>'Скинути',
+'Reset to original size'=>'Скинути до нормального розміру',
+'Save proportions'=>'Зберігати пропорції',
+'Width'=>'Ширина',
+'Height'=>'Висота',
+'Selected area: from'=>'Вибрана область: з',
+'to'=>'по',
+'Apply crop'=>'Обрізати',
+'Rotate'=>'Поворот',
+'90&deg; CCW'=>'90&deg; проти год.',
+'Rotate 90 degrees counterclockwise'=>'Повернути на 90 градусів проти годинникової стрілки',
+'90&deg; CW'=>'90&deg; за год.',
+'Rotate 90 degrees clockwise'=>'Повернути на 90 градусів за годинниковою стрілкою',
+'Flip'=>'Перевернути',
+'horisontal'=>'гор.',
+'vertical'=>'верт.',
+//'horisontal'=>'горизонтально',
+//'vertical'=>'вертикально',
+'Image Tools for'=>'Image Tools для'
+
+
+);
+?>

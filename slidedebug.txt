@@ -1,0 +1,19 @@
+$_post['sC']=Save Changes
+$_post['title1']=Contingencies of light
+UPDATE `slide` SET `title`='Contingencies of light' WHERE `id`='1'
+$_post['link1']=http://judy.caravanstudio.co.uk/work/Images/3/contingencies-of-light/
+UPDATE `slide` SET `link`='http://judy.caravanstudio.co.uk/work/Images/3/contingencies-of-light/' WHERE `id`='1'
+$_post['order1']=1
+UPDATE `slide` SET `order`='1' WHERE `id`='1'
+$_post['title5']=Contingencies of light
+UPDATE `slide` SET `title`='Contingencies of light' WHERE `id`='5'
+$_post['link5']=
+UPDATE `slide` SET `link`='' WHERE `id`='5'
+$_post['order5']=2
+UPDATE `slide` SET `order`='2' WHERE `id`='5'
+$_post['title3']=Nuclear Gaze
+UPDATE `slide` SET `title`='Nuclear Gaze' WHERE `id`='3'
+$_post['link3']=
+UPDATE `slide` SET `link`='' WHERE `id`='3'
+$_post['order3']=3
+UPDATE `slide` SET `order`='3' WHERE `id`='3'

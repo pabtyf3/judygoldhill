@@ -1,0 +1,193 @@
+<?php
+
+/**
+ * @author phpdes
+ * @copyright 2013
+ */
+
+class projectcategories{
+    
+    var $id="";
+    var $category="";
+    var $order="";
+    
+    function __construct($id=""){
+        if($id!=""){
+            $this->id=$id;
+            $this->populate();
+        }
+    }
+    
+    function populate(){
+        $sql = "SELECT * FROM `projectcategories` WHERE `id`='".$this->id."' LIMIT 1";
+        $res = mysql_query($sql);
+        if(mysql_num_rows($res)<1){
+            
+        }else{
+            $row = mysql_fetch_assoc($res);
+            foreach($row as $k=>$v){
+                $this->$k=$v;
+            }
+        }
+    }
+    
+    function form($action="add"){
+                $ret.="<form action = '/jg-admin/actions/formProcess.php' enctype='multipart/form-data' method='post'><fieldset>";
+        $ret.="<input type='hidden' name='class' value='projectcategories' />";
+        $ret.="<input type='hidden' name='id' value='".$this->id."'/>";
+        $ret.="<input type='hidden' name='action' value='".$action."' />";
+        $ret.="<input type='hidden' name='ret' value='/jg-admin/admin.php?class=projectcategories' />";
+        $ret.="<table>";
+        $ret.="<tr><td>Category Name:</td><td><input type='text' name='category' id='category' value='".$this->category."' /></td></tr>";
+        $ret.="<tr><td><input type='submit' name='sC' value='Save' /></td><td></td></tr>";
+        
+        $ret.="</table>";
+        $ret.="</fieldset></form>";
+        return($ret);
+        
+    }
+    
+    function processForm(){
+        if($_POST['action']=="add"){
+            $nid = $this->nextID();
+            $sql = "INSERT INTO `projectcategories` SET `category`='".mysql_real_escape_string(htmlentities(stripslashes($_POST['category']),ENT_QUOTES,"UTF-8",false))."',
+            `order`='".$nid."'";
+        }else{
+             $sql = "UPDATE `projectcategories` SET `category`='".mysql_real_escape_string(htmlentities(stripslashes($_POST['category']),ENT_QUOTES,"UTF-8",false))."'
+ WHERE `id`='".$_POST['id']."' LIMIT 1";
+        }
+        mysql_query($sql);
+    }
+    
+    function admin(){
+        
+        $sql = "SELECT * FROM `projectcategories` ORDER BY `order` ASC";
+       // echo $sql;
+        $res = mysql_query($sql);
+                $ret="<a href='/jg-admin/actions/add.php?class=projectcategories' class='falsebutton'><img src='/css/icons/add.png' alt='Add a Category' />Add Category</a>";
+        $ret.="<form action='/jg-admin/actions/update_order.php' method='post'><fieldset>
+        <input type='hidden' name='class' value='projectcategories' />
+      
+        <table style='width:750px;'>
+        <tr><td></td><td></td><td></td><td style='text-align:right;'><input type='submit' name='sC' value='Update Order' /></td></tr>
+            <tr><th>Category</th><th>Items in Category</th><th>Order</th><th>Actions</th></tr>";
+            $x=0; 
+             while($row = mysql_fetch_assoc($res)){
+            $c = $x%2==0?" class='odd'":"";
+            $tNews = new projectcategories($row['id']);
+            $nume = $tNews->items();
+            $ret.="<tr".$c."><td style='text-align:center;'>".$tNews->category."</td>
+            <td style='text-align:center;'>".$nume."</td>
+            <td style='text-align:center;'><input type='text' name='order".$tNews->id."' style='width:3em; text-align:center;' value='".$tNews->order."' /></td>
+            <td style='text-align:center;'>";
+      $ret.=" <a href='/jg-admin/actions/edit.php?class=projectcategories&id=".$tNews->id."'><img src='/css/icons/pencil.png' alt='Edit Category' /></a>";
+      if($nume<1){        
+      $ret.=" | <a href='/jg-admin/actions/delete.php?class=projectcategories&id=".$tNews->id."' title='Delete this Category'><img src='/css/icons/bin_closed.png' /></a>";
+                  }  
+                $ret.="</td></tr>";
+            
+            
+            $x++;
+        }
+        $ret.="</table></fieldset></form>";
+        
+        return($ret);
+        
+    }
+    
+    
+    function nextID(){
+        $sql = "SELECT `order` FROM `projectcategories` ORDER BY `order` DESC LIMIT 1";
+        $res = mysql_query($sql);
+        $row = mysql_fetch_assoc($res);
+        return($row['order']+1);
+    }
+    
+    
+    function items(){
+        $sql = "SELECT COUNT(id) AS `nume` FROM `project` WHERE `category` = '".$this->id."'";
+      //  echo $sql;
+        $res = mysql_query($sql);
+        $row = mysql_fetch_assoc($res);
+        return($row['nume']);
+    } 
+    
+    function update_order(){
+        foreach($_POST as $k=>$v){
+            if(strpos($k,"rder")){
+                $id = str_replace("order","",$k);
+                $sql = "UPDATE `projectcategories` SET `order` = '".$v."' WHERE `id`='".$id."' LIMIT 1";
+                mysql_query($sql);
+            }
+        }
+    }
+    
+    function delete(){
+        if($this->id!=""&&is_numeric($this->id)){
+            $sql = "DELETE FROM `projectcategories` WHERE `id` = '".$this->id."' LIMIT 1";
+            mysql_query($sql);
+        }
+    }
+    
+    function dropdown($current="",$name="category",$all=""){
+        $sql = "SELECT * FROM `projectcategories` ORDER BY `order` ASC";
+        $res = mysql_query($sql);
+        $ret = "<select name='".$name."' id='".$name."'>";
+        if($all!=""){
+            $ret.="<option value='none'>Filter by...</option>";
+        }
+        while($row = mysql_fetch_assoc($res)){
+            $ret.="<option value='".$row['id']."'";
+            $ret.=$current===$row['id']?" selected='selected'":"";
+            $ret.=">".$row['category']."</option>";
+        }
+        $ret.="</select>";
+        return($ret);
+    }
+    
+    function get_by_name($name=""){
+        if($name!=""){
+            $str = str_replace("_"," ",$name);
+            $sql = "SELECT * FROM `projectcategories` WHERE `category`LIKE '%".$str."%'";
+            $res = mysql_query($sql);
+            $row = mysql_fetch_assoc($res);
+            return($row['id']);
+        }
+    }
+    
+    
+    function for_leftnav($filter_id=""){
+        $ret.='<div id="leftnavarea2">
+
+<div id="projectFilter">';
+$sql = "SELECT * FROM `projectcategories` ORDER BY `order` ASC";
+$res = mysql_query($sql);
+while($row = mysql_fetch_assoc($res)){
+if($filter_id==$row['id']){
+    $ret.=$row['category'];    
+}else{
+    $ret.="<a href='/work/".strtolower(str_replace(" ","_",$row['category']))."/'>".$row['category']."</a>";
+}
+/*
+Images / <a href="#">Publications</a> / <a href="#">Projects</a>
+<br /><a href="#">Installations</a> / <a href="#">Video</a>
+*/
+$ret.=" / ";
+}
+$ret.='</div>
+<!-- end left nav 2-->
+</div>
+';
+return($ret);
+    }
+    
+    
+    function getFirst(){
+        $sql = "SELECT * FROM `projectcategories` ORDER BY `order` ASC LIMIT 1";
+        $res = mysql_query($sql);
+        $row= mysql_fetch_assoc($res);
+        return($row['category']);
+    }
+}
+
+?>
