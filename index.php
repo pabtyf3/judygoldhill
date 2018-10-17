@@ -1,4 +1,4 @@
-<?php include_once("/vhost/vhost11/j/u/d/judygoldhill.com/www/includes/config.inc"); 
+<?php include_once("/vhost/vhost18/j/u/d/judygoldhill.com/www/includes/config.inc"); 
 
 
     $c = new page(1);

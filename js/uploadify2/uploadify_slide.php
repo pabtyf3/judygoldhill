@@ -1,4 +1,4 @@
-<?php include("/vhost/vhost11/j/u/d/judygoldhill.com/www/includes/config.inc");
+<?php include("/vhost/vhost18/j/u/d/judygoldhill.com/www/includes/config.inc");
 /*
 Uploadify
 Copyright (c) 2012 Reactive Apps, Ronnie Garcia

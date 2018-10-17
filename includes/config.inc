@@ -4,7 +4,7 @@
  * @author pabtyf
  * @copyright 2011
  */
- $_SERVER['DOCUMENT_ROOT']="/vhost/vhost11/j/u/d/judygoldhill.com/www/";
+ $_SERVER['DOCUMENT_ROOT']="/vhost/vhost18/j/u/d/judygoldhill.com/www/";
  define("ERR",false,true);
 
 if(ERR){
